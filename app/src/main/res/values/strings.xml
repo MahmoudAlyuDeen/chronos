@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Miqat</string>
+    <string name="placeholder">Placeholder</string>
+
+    <!--main screen-->
+
+    <!--information-->
+
+    <!--errors and warnings-->
+    <string name="error_connection">Can\'t connect to the internet</string>
+    <string name="error_loading">Couldn\'t perform the requested action</string>
+</resources>
