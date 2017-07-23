@@ -11,10 +11,12 @@ import icepick.Icepick;
 import icepick.State;
 
 @SuppressWarnings("unused")
-public abstract class BaseActivity<V extends MvpView, P extends MvpPresenter<V>> extends MvpActivity<V, P> implements MvpView {
+public abstract class BaseActivity<V extends MvpView, P extends MvpPresenter<V>>
+        extends MvpActivity<V, P>
+        implements MvpView {
 
     @State
-    protected boolean isLoading;
+    protected int viewState;
     @State
     protected boolean userInteracted;
 
@@ -27,13 +29,28 @@ public abstract class BaseActivity<V extends MvpView, P extends MvpPresenter<V>>
     }
 
     public void showProgress() {
-        isLoading = true;
-        displayLoadingState();
+        viewState = Constants.VIEW_STATE_PROGRESS;
+        displayViewState();
     }
 
-    public void hideProgress() {
-        isLoading = false;
-        displayLoadingState();
+    public void showError() {
+        viewState = Constants.VIEW_STATE_ERROR;
+        displayViewState();
+    }
+
+    public void showEmpty() {
+        viewState = Constants.VIEW_STATE_EMPTY;
+        displayViewState();
+    }
+
+    public void showContent() {
+        viewState = Constants.VIEW_STATE_CONTENT;
+        displayViewState();
+    }
+
+    public void showAction() {
+        viewState = Constants.VIEW_STATE_ACTION;
+        displayViewState();
     }
 
     @Override
@@ -43,7 +60,7 @@ public abstract class BaseActivity<V extends MvpView, P extends MvpPresenter<V>>
         retainInstance = true;
         landscape = getResources().getBoolean(R.bool.landscape);
         if (savedInstanceState == null) {
-            isLoading = false;
+            viewState = Constants.VIEW_STATE_IDLE;
             userInteracted = false;
         }
     }
@@ -51,10 +68,10 @@ public abstract class BaseActivity<V extends MvpView, P extends MvpPresenter<V>>
     @Override
     protected void onResume() {
         super.onResume();
-        displayLoadingState();
+        displayViewState();
     }
 
-    protected void displayLoadingState() {
+    protected void displayViewState() {
     }
 
     @Override
@@ -76,55 +93,13 @@ public abstract class BaseActivity<V extends MvpView, P extends MvpPresenter<V>>
         }
     }
 
+    private void showDataLossConfirmation() {
+    }
+
     protected void discardData() {
     }
 
     public void showConnectionError() {
         Toast.makeText(this, R.string.error_connection, Toast.LENGTH_SHORT).show();
-    }
-
-    public void showLoadingError() {
-        Toast.makeText(this, R.string.error_loading, Toast.LENGTH_SHORT).show();
-    }
-
-    //todo: uncomment and configure when implementing authentication
-    public void showAuthorizationError() {
-//        new MaterialDialog.Builder(this)
-//                .title(R.string.dialog_auth_title)
-//                .content(R.string.dialog_auth_message)
-//                .positiveText(R.string.dialog_auth_positive_button)
-//                .theme(Resources.Theme.DARK)
-//                .cancelable(false)
-//                .onPositive(new MaterialDialog.SingleButtonCallback() {
-//                    @Override
-//                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-//                        ((Application) getApplication()).performSignOut(BaseActivity.this);
-//                    }
-//                })
-//                .autoDismiss(true)
-//                .show();
-    }
-
-    protected void showDataLossConfirmation() {
-//        new MaterialDialog.Builder(this)
-//                .title(R.string.dialog_date_loss_title)
-//                .content(R.string.dialog_date_loss_message)
-//                .positiveText(R.string.dialog_date_loss_positive_button)
-//                .negativeText(R.string.dialog_date_loss_negative_button)
-//                .theme(Theme.DARK)
-//                .positiveColor(ContextCompat.getColor(this, R.color.colorRed))
-//                .onPositive(new MaterialDialog.SingleButtonCallback() {
-//                    @Override
-//                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-//                        discardData();
-//                    }
-//                })
-//                .onNegative(new MaterialDialog.SingleButtonCallback() {
-//                    @Override
-//                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-//                        dialog.dismiss();
-//                    }
-//                })
-//                .show();
     }
 }

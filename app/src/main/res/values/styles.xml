@@ -10,6 +10,8 @@
         <item name="windowNoTitle">true</item>
         <item name="android:textAlignment">gravity</item>
         <item name="android:textDirection">locale</item>
+        <item name="colorControlNormal">@color/colorWhite</item>
+        <item name="titleTextColor">@color/colorWhite</item>
     </style>
 
 </resources>
