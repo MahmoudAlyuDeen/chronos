@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#b39ddb</color>
-    <color name="colorPrimaryDark">#836fa9</color>
-    <color name="colorAccent">#FF5722</color>
+    <color name="colorPrimary">#00BCD4</color>
+    <color name="colorPrimaryDark">#0097A7</color>
+    <color name="colorAccent">#b39ddb</color>
 
     <!--opaque black-->
     <color name="colorTextPrimary">#BF000000</color>
@@ -18,6 +18,6 @@
     <color name="colorDeepGrey">#262626</color>
     <color name="colorGrey">#424242</color>
     <color name="colorDivider">#eeeef3</color>
-    <color name="colorOpaqueWhite">#cdffffff</color>
+    <color name="colorOpaqueWhite">#5affffff</color>
 
 </resources>

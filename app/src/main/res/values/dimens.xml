@@ -17,4 +17,8 @@
     <dimen name="simple_padding_huge">56dp</dimen>
 
     <dimen name="toolbar_progress_size">24dp</dimen>
+    <dimen name="card_corner_radius">4dp</dimen>
+
+    <!--location-->
+    <dimen name="item_location_height">124dp</dimen>
 </resources>

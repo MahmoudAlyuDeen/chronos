@@ -5,11 +5,17 @@ package com.afterapps.chronos;
  */
 
 
+import io.realm.Realm;
+import io.realm.RealmConfiguration;
+
 public class Application extends android.app.Application {
 
     @Override
-        public void onCreate() {
+    public void onCreate() {
         super.onCreate();
+        Realm.init(this);
+        RealmConfiguration config = new RealmConfiguration.Builder().build();
+        Realm.setDefaultConfiguration(config);
         //todo: enable un-comment out this before release
 //        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
 //            @Override

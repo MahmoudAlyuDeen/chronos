@@ -51,6 +51,10 @@ public abstract class BaseLocationActivity<V extends MvpView, P extends MvpPrese
     @Override
     public abstract P createPresenter();
 
+    protected void connectLocationClient() {
+        mGoogleApiClient.connect();
+    }
+
     @Override
     protected void onStop() {
         super.onStop();
