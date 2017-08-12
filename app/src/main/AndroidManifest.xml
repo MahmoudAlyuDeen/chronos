@@ -15,19 +15,17 @@
         tools:ignore="AllowBackup,GoogleAppIndexingWarning">
 
         <activity android:name="com.afterapps.chronos.home.HomeActivity">
-
-        </activity>
-
-        <activity android:name=".location.LocationActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
 
+        <activity android:name=".location.LocationActivity"/>
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyCUSRQAQCa5CmKPWe_VWdlArClGjQTXAZE" />
+            android:value="AIzaSyCUSRQAQCa5CmKPWe_VWdlArClGjQTXAZE"/>
 
     </application>
 

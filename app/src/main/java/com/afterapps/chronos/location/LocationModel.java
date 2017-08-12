@@ -4,7 +4,6 @@ package com.afterapps.chronos.location;
  * Created by mahmoudalyudeen on 7/24/17.
  */
 
-import com.afterapps.chronos.Constants;
 import com.afterapps.chronos.api.Responses.ReverseGeoLocResponse;
 import com.afterapps.chronos.api.ReverseGeoLocService;
 import com.afterapps.chronos.api.ServiceGenerator;
@@ -44,7 +43,7 @@ class LocationModel {
 
     void onLocationDetected(final android.location.Location geoLocation) {
         final ReverseGeoLocService service =
-                ServiceGenerator.createService(ReverseGeoLocService.class, Constants.REVERSE_GEO_LOC_API_BASE_UEL);
+                ServiceGenerator.createGeoLocService();
         if (mReverseGeoLocCall != null) {
             mReverseGeoLocCall.cancel();
         }

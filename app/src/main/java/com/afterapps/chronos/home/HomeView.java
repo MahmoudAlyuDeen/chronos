@@ -8,4 +8,13 @@ import com.hannesdorfmann.mosby3.mvp.MvpView;
 
 interface HomeView extends MvpView {
 
+    void showProgress();
+
+    void showAction();
+
+    void showError();
+
+    void showEmpty();
+
+    void showContent();
 }

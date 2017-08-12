@@ -45,7 +45,7 @@ public class LocationActivity
     @BindView(R.id.locations_recycler)
     RecyclerView mLocationsRecycler;
 
-    private Realm realm;
+    private Realm mRealm;
 
     @NonNull
     @Override
@@ -65,13 +65,13 @@ public class LocationActivity
     @Override
     protected void onStart() {
         super.onStart();
-        realm = Realm.getDefaultInstance();
+        mRealm = Realm.getDefaultInstance();
         displayLocations();
         EventBus.getDefault().register(this);
     }
 
     private void displayLocations() {
-        OrderedRealmCollection<Location> locations = realm.where(Location.class).findAll();
+        OrderedRealmCollection<Location> locations = mRealm.where(Location.class).findAll();
         LocationsAdapter adapter = new LocationsAdapter(locations, this);
         mLocationsRecycler.setAdapter(adapter);
     }
@@ -79,7 +79,7 @@ public class LocationActivity
     @Override
     protected void onStop() {
         super.onStop();
-        realm.close();
+        mRealm.close();
         EventBus.getDefault().unregister(this);
     }
 
@@ -152,15 +152,14 @@ public class LocationActivity
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onLocationSelected(LocationsAdapter.LocationClickEvent event) {
-        if (realm != null && !realm.isClosed()) {
-            presenter.onLocationSelected(event.getTimezoneId());
-        }
+        presenter.onLocationSelected(event.getTimezoneId());
     }
 
     @Override
     public void onLocationHandled() {
         finish();
     }
+
 
     @Override
     protected void showLocationDetectionError() {
