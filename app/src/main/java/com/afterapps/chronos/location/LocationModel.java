@@ -36,7 +36,13 @@ class LocationModel {
         mLocationCallBack = locationCallBack;
     }
 
-    void handleLocation(final android.location.Location geoLocation) {
+    void onLocationSelected(String timezoneId) {
+        unSelectOldLocations();
+        selectLocation(timezoneId);
+        mLocationCallBack.onLocationHandled();
+    }
+
+    void onLocationDetected(final android.location.Location geoLocation) {
         final ReverseGeoLocService service =
                 ServiceGenerator.createService(ReverseGeoLocService.class, Constants.REVERSE_GEO_LOC_API_BASE_UEL);
         if (mReverseGeoLocCall != null) {
@@ -47,10 +53,14 @@ class LocationModel {
                 getCoordinates(geoLocation));
 
         mReverseGeoLocCall.enqueue(new Callback<ReverseGeoLocResponse>() {
+            @SuppressWarnings("ConstantConditions")
             @Override
             public void onResponse(Call<ReverseGeoLocResponse> call, Response<ReverseGeoLocResponse> response) {
                 if (isResponseValid(response)) {
-                    handleReverseGeoLocResponse(geoLocation, response.body());
+                    unSelectOldLocations();
+                    createLocation(geoLocation, response.body());
+                    selectLocation(response.body().getTimeZoneId());
+                    mLocationCallBack.onLocationHandled();
                 } else {
                     mLocationCallBack.onLocationError();
                 }
@@ -63,26 +73,46 @@ class LocationModel {
         });
     }
 
-    private void handleReverseGeoLocResponse(final android.location.Location geoLocation,
-                                             final ReverseGeoLocResponse reverseGeoLocResponse) {
-
+    private void selectLocation(final String timeZoneId) {
         Realm realm = Realm.getDefaultInstance();
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                final Location location = realm.where(Location.class)
+                        .equalTo("timezoneId", timeZoneId).findFirst();
+                if (location != null) {
+                    location.setSelected(true);
+                }
+                realm.close();
+            }
+        });
+    }
 
+    private void createLocation(final android.location.Location geoLocation,
+                                final ReverseGeoLocResponse reverseGeoLocResponse) {
+        Realm realm = Realm.getDefaultInstance();
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                final Location location = realm.where(Location.class)
+                        .equalTo("timezoneId", reverseGeoLocResponse.getTimeZoneId()).findFirst();
+                if (location == null) {
+                    Location newLocation = new Location(geoLocation, reverseGeoLocResponse);
+                    realm.copyToRealmOrUpdate(newLocation);
+                }
+                realm.close();
+            }
+        });
+    }
+
+    private void unSelectOldLocations() {
+        Realm realm = Realm.getDefaultInstance();
         realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
                 final RealmResults<Location> locations = realm.where(Location.class).findAll();
-                final Location location = locations.where().
-                        equalTo("timezoneId", reverseGeoLocResponse.getTimeZoneId()).findFirst();
-
-                if (location == null) {
-                    Location newLocation = new Location(geoLocation, reverseGeoLocResponse);
-                    realm.copyToRealmOrUpdate(newLocation);
-                } else {
-                    for (Location oldLocation : locations) {
-                        oldLocation.setSelected(false);
-                    }
-                    location.setSelected(true);
+                for (Location oldLocation : locations) {
+                    oldLocation.setSelected(false);
                 }
                 realm.close();
             }
@@ -98,6 +128,7 @@ class LocationModel {
         return response.isSuccessful() &&
                 response.body() != null &&
                 response.body().getStatus() != null &&
-                response.body().getStatus().equals("OK");
+                response.body().getStatus().equals("OK") &&
+                response.body().getTimeZoneId() != null;
     }
 }

@@ -35,30 +35,40 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <android.support.v7.widget.CardView
+            <LinearLayout
                 android:id="@+id/location_add"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/item_location_height"
-                android:layout_marginEnd="@dimen/simple_padding_large"
-                android:layout_marginStart="@dimen/simple_padding_large"
-                android:layout_marginTop="@dimen/simple_padding_large"
+                android:layout_height="wrap_content"
                 android:foreground="?attr/selectableItemBackground"
-                app:cardCornerRadius="@dimen/card_corner_radius">
+                android:minHeight="?attr/listPreferredItemHeight"
+                android:orientation="horizontal"
+                android:padding="@dimen/simple_padding_medium"
+                tools:ignore="UseCompoundDrawables">
+
+                <ImageView
+                    android:id="@+id/item_location_active_radio_button"
+                    android:layout_width="@dimen/location_radio_size"
+                    android:layout_height="@dimen/location_radio_size"
+                    android:layout_margin="@dimen/simple_padding_medium"
+                    android:src="@drawable/ic_add_accent"
+                    tools:ignore="ContentDescription"/>
 
                 <TextView
                     android:id="@+id/item_location_title_text_view"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="bottom"
+                    android:layout_gravity="center_vertical"
+                    android:layout_margin="@dimen/simple_padding_medium"
+                    android:background="@color/colorOpaqueWhite"
+                    android:ellipsize="end"
                     android:gravity="start"
                     android:lines="1"
-                    android:padding="@dimen/simple_padding_large"
                     android:text="@string/action_add_location"
                     android:textColor="@color/colorTextPrimary"
                     android:textSize="@dimen/text_size_primary"
                     android:textStyle="bold"/>
 
-            </android.support.v7.widget.CardView>
+            </LinearLayout>
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/locations_recycler"
@@ -66,7 +76,6 @@
                 android:layout_height="wrap_content"
                 android:clipToPadding="false"
                 android:isScrollContainer="true"
-                android:padding="@dimen/simple_padding_medium"
                 app:layoutManager="android.support.v7.widget.LinearLayoutManager"
                 tools:listitem="@layout/item_location"/>
 

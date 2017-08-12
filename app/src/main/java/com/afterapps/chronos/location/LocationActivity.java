@@ -2,22 +2,29 @@ package com.afterapps.chronos.location;
 
 import android.content.Intent;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
+import android.widget.LinearLayout;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.materialdialogs.StackingBehavior;
 import com.afterapps.chronos.BaseLocationActivity;
+import com.afterapps.chronos.Constants;
 import com.afterapps.chronos.R;
 import com.afterapps.chronos.beans.Location;
 import com.google.android.gms.location.places.AutocompleteFilter;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -34,7 +41,7 @@ public class LocationActivity
     @BindView(R.id.places_toolbar)
     Toolbar mPlacesToolbar;
     @BindView(R.id.location_add)
-    CardView mLocationAdd;
+    LinearLayout mLocationAdd;
     @BindView(R.id.locations_recycler)
     RecyclerView mLocationsRecycler;
 
@@ -60,6 +67,7 @@ public class LocationActivity
         super.onStart();
         realm = Realm.getDefaultInstance();
         displayLocations();
+        EventBus.getDefault().register(this);
     }
 
     private void displayLocations() {
@@ -72,6 +80,7 @@ public class LocationActivity
     protected void onStop() {
         super.onStop();
         realm.close();
+        EventBus.getDefault().unregister(this);
     }
 
     @OnClick(R.id.location_add)
@@ -112,7 +121,15 @@ public class LocationActivity
             startActivityForResult(intent, RC_PLACES_AUTO_COMPLETE_OVERLAY);
 
         } catch (Exception e) {
-            Snackbar.make(mLocationsRecycler, R.string.play_services_error, Snackbar.LENGTH_LONG).show();
+            Snackbar.make(mLocationsRecycler, R.string.error_play_services, Snackbar.LENGTH_INDEFINITE)
+                    .setAction(R.string.action_play_services, new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Intent browserIntent =
+                                    new Intent(Intent.ACTION_VIEW, Uri.parse(Constants.PLAY_SERVICES_LINK));
+                            startActivity(browserIntent);
+                        }
+                    }).show();
         }
     }
 
@@ -130,6 +147,34 @@ public class LocationActivity
 
     @Override
     public void onLocationChanged(android.location.Location geoLocation) {
-        presenter.onLocationAvailable(geoLocation);
+        presenter.onLocationDetected(geoLocation);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onLocationSelected(LocationsAdapter.LocationClickEvent event) {
+        if (realm != null && !realm.isClosed()) {
+            presenter.onLocationSelected(event.getTimezoneId());
+        }
+    }
+
+    @Override
+    public void onLocationHandled() {
+        finish();
+    }
+
+    @Override
+    protected void showLocationDetectionError() {
+        Snackbar.make(mLocationsRecycler, R.string.error_location_detection, Snackbar.LENGTH_INDEFINITE)
+                .setAction(R.string.action_location_manual, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        startAutoCompleteOverlay();
+                    }
+                }).show();
+    }
+
+    @Override
+    public void onLocationError() {
+        showLocationDetectionError();
     }
 }

@@ -45,4 +45,16 @@
     <string name="action_add_location">إضافة موقع</string>
     <string name="intro_location_card_title">كيف يعمل ميقات</string>
     <string name="preference_title_design">تصميم المسجد من Starline - FreePik.com</string>
+    <string name="action_location_manual">البحث</string>
+    <string name="action_play_services">تثبيت</string>
+    <string name="cancel">إلغاء</string>
+    <string name="dialog_content_location_method">هل تود تحديد موقعك اوتوماتيكيا؟
+        \n\n(قد يطلب منك إذن استخدام الموقع)</string>
+    <string name="dialog_negative_location_method">إبحث بنفسك</string>
+    <string name="dialog_positive_location_method">حدد الموقع اوتوماتيكيا</string>
+    <string name="dialog_title_location_method">الموقع</string>
+    <string name="error_location_detection">لم نتمكن من تحديد موقعك</string>
+    <string name="error_play_services">يجب أن يكون لديك Google play services</string>
+    <string name="ok">حسنا</string>
+    <string name="rationale_location">إذن الموفع مطلوب لنتمكن من تحديد موقعك</string>
 </resources>

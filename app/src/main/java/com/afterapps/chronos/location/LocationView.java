@@ -8,4 +8,7 @@ import com.hannesdorfmann.mosby3.mvp.MvpView;
 
 interface LocationView extends MvpView {
 
+    void onLocationHandled();
+
+    void onLocationError();
 }

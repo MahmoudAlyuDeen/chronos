@@ -7,6 +7,8 @@ package com.afterapps.chronos;
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class Constants {
 
+    public static final String PLAY_SERVICES_LINK = "https://play.google.com/store/apps/details?id=com.google.android.gms";
+
     private Constants() {
     }
 
@@ -21,7 +23,4 @@ public class Constants {
     public static final int VIEW_STATE_ERROR = 3;
     public static final int VIEW_STATE_ACTION = 4;
     public static final int VIEW_STATE_EMPTY = 5;
-
-    public static final String STATIC_MAP_URL_FORMAT =
-            "https://maps.googleapis.com/maps/api/staticmap?size=700x700&zoom=10&center=%1$s,%2$s";
 }

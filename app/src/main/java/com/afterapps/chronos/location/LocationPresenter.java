@@ -12,20 +12,31 @@ class LocationPresenter extends MvpBasePresenter<LocationView> implements Locati
 
     private LocationModel mLocationModel;
 
-    void onLocationAvailable(Location geoLocation) {
+    void onLocationDetected(Location geoLocation) {
         if (mLocationModel == null) {
             mLocationModel = new LocationModel(this);
         }
-        mLocationModel.handleLocation(geoLocation);
+        mLocationModel.onLocationDetected(geoLocation);
     }
 
     @Override
     public void onLocationHandled() {
-
+        if (isViewAttached() && getView() != null) {
+            getView().onLocationHandled();
+        }
     }
 
     @Override
     public void onLocationError() {
+        if (isViewAttached() && getView() != null) {
+            getView().onLocationError();
+        }
+    }
 
+    void onLocationSelected(String timezoneId) {
+        if (mLocationModel == null) {
+            mLocationModel = new LocationModel(this);
+        }
+        mLocationModel.onLocationSelected(timezoneId);
     }
 }

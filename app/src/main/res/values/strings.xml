@@ -29,7 +29,7 @@
     <!--errors and warnings-->
     <string name="error_connection">Can\'t connect to prayers server\nTouch to retry!</string>
     <string name="reverse_geo_error">Can\'t add location; system time is not set correctly</string>
-    <string name="play_services_error">Google Play Services must be installed</string>
+    <string name="error_play_services">Google Play Services must be installed</string>
 
     <!--preferences-->
     <string name="preference_key_design" translatable="false">preferenceKeyDesign</string>
@@ -65,12 +65,12 @@
     <string name="night_ar">Isha\'a</string>
 
     <!--prayer names english-->
-    <string name="dawn_en">The dawn prayer</string>
-    <string name="sunrise_en">Sunrise</string>
-    <string name="noon_en">The noon prayer</string>
-    <string name="afternoon_en">The afternoon prayer</string>
-    <string name="sunset_en">The sunset prayer</string>
-    <string name="night_en">The night prayer</string>
+    <string name="dawn_en" translatable="false">The dawn prayer</string>
+    <string name="sunrise_en" translatable="false">Sunrise</string>
+    <string name="noon_en" translatable="false">The noon prayer</string>
+    <string name="afternoon_en" translatable="false">The afternoon prayer</string>
+    <string name="sunset_en" translatable="false">The sunset prayer</string>
+    <string name="night_en" translatable="false">The night prayer</string>
 
     <!--locations screen-->
     <string name="title_location">Location</string>
@@ -80,7 +80,11 @@
     <string name="dialog_title_location_method">Location</string>
     <string name="dialog_content_location_method">Would you like your location to be determined automatically?
         \n\n(You may be prompted to grant location permission)</string>
-    <string name="dialog_positive_location_method">Yes, determine automatically</string>
-    <string name="dialog_negative_location_method">No, use manual search</string>
+    <string name="dialog_positive_location_method">Determine automatically</string>
+    <string name="dialog_negative_location_method">Manual search</string>
+    <string name="empty_string" translatable="false"/>
+    <string name="action_play_services">Install</string>
+    <string name="error_location_detection">Couldn\'t detect your location</string>
+    <string name="action_location_manual">Search</string>
 
 </resources>

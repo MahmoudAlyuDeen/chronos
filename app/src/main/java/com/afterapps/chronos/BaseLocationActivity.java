@@ -11,6 +11,7 @@ import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -19,14 +20,15 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.hannesdorfmann.mosby3.mvp.MvpPresenter;
 import com.hannesdorfmann.mosby3.mvp.MvpView;
 
@@ -46,13 +48,19 @@ public abstract class BaseLocationActivity<V extends MvpView, P extends MvpPrese
 
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
+    private FusedLocationProviderClient mFusedLocationProviderClient;
 
     @NonNull
     @Override
     public abstract P createPresenter();
 
     protected void connectLocationClient() {
-        mGoogleApiClient.connect();
+        if (mGoogleApiClient != null) {
+            if (mGoogleApiClient.isConnected()) {
+                mGoogleApiClient.disconnect();
+            }
+            mGoogleApiClient.connect();
+        }
     }
 
     @Override
@@ -93,31 +101,22 @@ public abstract class BaseLocationActivity<V extends MvpView, P extends MvpPrese
             return;
         }
 
-        LocationServices.getFusedLocationProviderClient(this)
-                .getLastLocation()
-                .addOnCompleteListener(new OnCompleteListener<Location>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Location> task) {
-                        if (task.isSuccessful() && task.getResult() != null) {
-                            onLocationChanged(task.getResult());
-                        } else {
-                            mLocationRequest = LocationRequest.create();
-                            mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-                            mLocationRequest.setExpirationDuration(60000);
-                            mLocationRequest.setInterval(10000);
-                            mLocationRequest.setFastestInterval(500);
-                            mLocationRequest.setNumUpdates(1);
+        mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
-                            LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
-                                    .setAlwaysShow(true)
-                                    .addLocationRequest(mLocationRequest);
-                            PendingResult<LocationSettingsResult> result =
-                                    LocationServices.SettingsApi.checkLocationSettings(mGoogleApiClient,
-                                            builder.build());
-                            result.setResultCallback(BaseLocationActivity.this);
-                        }
-                    }
-                });
+        mLocationRequest = LocationRequest.create();
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        mLocationRequest.setExpirationDuration(60000);
+        mLocationRequest.setInterval(10000);
+        mLocationRequest.setFastestInterval(500);
+        mLocationRequest.setNumUpdates(1);
+
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
+                .setAlwaysShow(true)
+                .addLocationRequest(mLocationRequest);
+        PendingResult<LocationSettingsResult> result =
+                LocationServices.SettingsApi.checkLocationSettings(mGoogleApiClient,
+                        builder.build());
+        result.setResultCallback(BaseLocationActivity.this);
     }
 
     @Override
@@ -125,7 +124,20 @@ public abstract class BaseLocationActivity<V extends MvpView, P extends MvpPrese
         final Status status = result.getStatus();
         switch (status.getStatusCode()) {
             case LocationSettingsStatusCodes.SUCCESS:
-                checkLocationPermissionAndRequestLocation();
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                        != PackageManager.PERMISSION_GRANTED &&
+                        ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                                != PackageManager.PERMISSION_GRANTED) {
+                    return;
+                }
+                mFusedLocationProviderClient
+                        .requestLocationUpdates(mLocationRequest, new LocationCallback() {
+                            @Override
+                            public void onLocationResult(LocationResult locationResult) {
+                                onLocationChanged(locationResult.getLastLocation());
+                            }
+                        }, Looper.myLooper());
+
                 break;
             case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
                 try {
@@ -134,10 +146,12 @@ public abstract class BaseLocationActivity<V extends MvpView, P extends MvpPrese
                 }
                 break;
             case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
-                showError();
+                showLocationDetectionError();
                 break;
         }
     }
+
+    protected abstract void showLocationDetectionError();
 
     @Override
     public abstract void onLocationChanged(Location location);

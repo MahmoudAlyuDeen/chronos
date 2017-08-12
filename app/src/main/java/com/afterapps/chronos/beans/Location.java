@@ -25,7 +25,7 @@ public class Location extends RealmObject {
     public Location(android.location.Location geoLocation, ReverseGeoLocResponse reverseGeoLocResponse) {
         final String timeZoneId = reverseGeoLocResponse.getTimeZoneId();
         timezoneId = reverseGeoLocResponse.getTimeZoneId();
-        displayName = timeZoneId.substring(timeZoneId.indexOf("/") + 1);
+        displayName = timeZoneId.substring(timeZoneId.indexOf("/") + 1).replace("_", " ");
         longitude = geoLocation.getLongitude();
         latitude = geoLocation.getLatitude();
         selected = true;
