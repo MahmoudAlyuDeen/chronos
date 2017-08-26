@@ -21,4 +21,7 @@
     <!--location-->
     <dimen name="location_radio_size">32dp</dimen>
 
+    <!--home-->
+    <dimen name="prayer_logo_size">46dp</dimen>
+
 </resources>

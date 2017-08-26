@@ -2,20 +2,35 @@ package com.afterapps.chronos.home;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
 import com.afterapps.chronos.BaseActivity;
 import com.afterapps.chronos.R;
+import com.afterapps.chronos.beans.Prayer;
 
+import java.util.Date;
+import java.util.List;
+
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class HomeActivity
         extends BaseActivity<HomeView, HomePresenter>
         implements HomeView, SharedPreferences.OnSharedPreferenceChangeListener {
 
+    @BindView(R.id.home_prayers_recycler)
+    RecyclerView mHomePrayersRecycler;
+
     private SharedPreferences mPref;
+
+    private List<Prayer> mPrayerList;
+
+    private Handler mTickerHandler;
+    private Runnable mTickerRunnable;
 
     @NonNull
     @Override
@@ -35,6 +50,7 @@ public class HomeActivity
     @Override
     protected void onStop() {
         super.onStop();
+        stopTicking();
         if (mPref != null) {
             mPref.unregisterOnSharedPreferenceChangeListener(this);
         }
@@ -60,5 +76,44 @@ public class HomeActivity
     @Override
     protected void displayViewState() {
         Log.d("@@@@", "displayViewState: " + viewState);
+    }
+
+    @Override
+    public void onPrayersReady(List<Prayer> upcomingPrayersDetached) {
+        mPrayerList = upcomingPrayersDetached;
+        startTicking();
+    }
+
+    void startTicking() {
+        mTickerHandler = new Handler();
+        mTickerRunnable = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    filterPrayers();
+                } finally {
+                    mTickerHandler.postDelayed(mTickerRunnable, 1000);
+                }
+            }
+        };
+        mTickerRunnable.run();
+    }
+
+    void stopTicking() {
+        if (mTickerHandler != null && mTickerRunnable != null) {
+            mTickerHandler.removeCallbacks(mTickerRunnable);
+        }
+    }
+
+    private void filterPrayers() {
+        List<Prayer> upcomingPrayers = presenter.getUpcomingPrayers(mPrayerList, new Date().getTime());
+        if (upcomingPrayers != null) {
+            displayPrayerSchedule(upcomingPrayers);
+        }
+    }
+
+    private void displayPrayerSchedule(List<Prayer> upcomingPrayers) {
+        PrayersAdapter adapter = new PrayersAdapter(this, upcomingPrayers);
+        mHomePrayersRecycler.setAdapter(adapter);
     }
 }

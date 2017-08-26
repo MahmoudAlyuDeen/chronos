@@ -3,6 +3,7 @@
     <!--misc-->
     <string name="app_name">Miqat</string>
     <string name="placeholder" translatable="false">Placeholder</string>
+    <string name="placeholder_timing" translatable="false">00:00</string>
     <string name="geo_api_key" translatable="false">AIzaSyCUSRQAQCa5CmKPWe_VWdlArClGjQTXAZE</string>
     <string name="about_api_url" translatable="false">http://aladhan.com/about</string>
 

@@ -1,2 +1,2 @@
-# horus
-Stock Hawk - Udacity Android NanoDegree Project
+# chronos
+Miqat - Udacity Android NanoDegree Final Project

@@ -25,7 +25,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:layout_margin="@dimen/simple_padding_medium"
-        android:background="@color/colorOpaqueWhite"
         android:ellipsize="end"
         android:gravity="start"
         android:lines="1"

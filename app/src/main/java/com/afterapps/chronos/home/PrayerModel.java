@@ -4,6 +4,8 @@ package com.afterapps.chronos.home;
  * Created by mahmoud on 8/12/17.
  */
 
+import android.support.annotation.NonNull;
+
 import com.afterapps.chronos.api.Responses.TimingsResponse;
 import com.afterapps.chronos.api.ServiceGenerator;
 import com.afterapps.chronos.api.TimingsService;
@@ -11,7 +13,6 @@ import com.afterapps.chronos.beans.Location;
 import com.afterapps.chronos.beans.Prayer;
 
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 import io.realm.Realm;
@@ -30,7 +31,7 @@ class PrayerModel {
 
         void onConnectionError();
 
-        void onLocalError();
+        void onLogicError();
     }
 
     private final PrayerCallback mPrayerCallback;
@@ -49,27 +50,33 @@ class PrayerModel {
             realm.close();
             return;
         }
-        String timeZoneId = location.getTimezoneId();
+        Location locationDetached = realm.copyFromRealm(location);
+        realm.close();
+        String timeZoneId = locationDetached.getTimezoneId();
         String signature = timeZoneId + method + school + latitudeMethod;
-        long currentTimestamp = new Date().getTime();
-        RealmResults<Prayer> upcomingPrayers = realm.where(Prayer.class)
-                .equalTo("signature", signature)
-                .greaterThan("timestamp", currentTimestamp)
-                .findAllSorted("timestamp", Sort.ASCENDING);
-        if (upcomingPrayers.size() == 0) {
-            Location locationDetached = realm.copyFromRealm(location);
+        List<Prayer> prayersDetached = getPrayers(signature);
+        if (prayersDetached.size() == 0) {
             fetchPrayers(method, school, latitudeMethod, locationDetached);
-            realm.close();
             return;
         }
-        List<Prayer> upcomingPrayersDetached = realm.copyFromRealm(upcomingPrayers);
-        mPrayerCallback.onPrayersReady(upcomingPrayersDetached);
-        realm.close();
+        mPrayerCallback.onPrayersReady(prayersDetached);
     }
 
-    private void fetchPrayers(final int method, final int school, final int latitudeMethod, final Location locationDetached) {
+    private List<Prayer> getPrayers(String signature) {
+        Realm realm = Realm.getDefaultInstance();
+        List<Prayer> prayersDetached = realm.copyFromRealm(realm.where(Prayer.class)
+                .equalTo("signature", signature)
+                .findAllSorted("timestamp", Sort.ASCENDING));
+        realm.close();
+        return prayersDetached;
+    }
+
+    private void fetchPrayers(final int method,
+                              final int school,
+                              final int latitudeMethod,
+                              final Location locationDetached) {
         Calendar currentTimeCal = Calendar.getInstance();
-        int currentMonth = currentTimeCal.get(Calendar.MONTH);
+        int currentMonth = currentTimeCal.get(Calendar.MONTH) + 1;
         int currentYear = currentTimeCal.get(Calendar.YEAR);
         TimingsService timingsService = ServiceGenerator.createTimingsService();
         Call<TimingsResponse> timingsCall = timingsService.getTimings(
@@ -84,7 +91,7 @@ class PrayerModel {
         );
         timingsCall.enqueue(new Callback<TimingsResponse>() {
             @Override
-            public void onResponse(Call<TimingsResponse> call, Response<TimingsResponse> response) {
+            public void onResponse(@NonNull Call<TimingsResponse> call, @NonNull Response<TimingsResponse> response) {
                 if (isResponseValid(response)) {
                     storePrayers(response.body(), method, school, latitudeMethod, locationDetached);
                 } else {
@@ -93,17 +100,17 @@ class PrayerModel {
             }
 
             @Override
-            public void onFailure(Call<TimingsResponse> call, Throwable t) {
+            public void onFailure(@NonNull Call<TimingsResponse> call, @NonNull Throwable t) {
                 mPrayerCallback.onConnectionError();
             }
         });
     }
 
-    private void storePrayers(TimingsResponse timingsResponse,
-                              int method,
-                              int school,
-                              int latitudeMethod,
-                              Location locationDetached) {
+    private void storePrayers(final TimingsResponse timingsResponse,
+                              final int method,
+                              final int school,
+                              final int latitudeMethod,
+                              final Location locationDetached) {
         try {
             final List<Prayer> prayers = timingsResponse.getPrayers(method,
                     school,
@@ -115,13 +122,19 @@ class PrayerModel {
                 public void execute(Realm realm) {
                     RealmResults<Prayer> oldPrayers = realm.where(Prayer.class).findAll();
                     oldPrayers.deleteAllFromRealm();
-                    List<Prayer> prayersDetached =
-                            realm.copyFromRealm(realm.copyToRealmOrUpdate(prayers));
+                    realm.copyToRealmOrUpdate(prayers);
+                    String timeZoneId = locationDetached.getTimezoneId();
+                    String signature = timeZoneId + method + school + latitudeMethod;
+                    List<Prayer> prayersDetached = getPrayers(signature);
+                    if (prayersDetached.size() == 0) {
+                        mPrayerCallback.onLogicError();
+                        return;
+                    }
                     mPrayerCallback.onPrayersReady(prayersDetached);
                 }
             });
         } catch (IllegalAccessException e) {
-            mPrayerCallback.onLocalError();
+            mPrayerCallback.onLogicError();
         }
     }
 

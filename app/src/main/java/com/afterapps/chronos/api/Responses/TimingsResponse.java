@@ -140,13 +140,14 @@ public class TimingsResponse {
                 Field[] fields = Timings.class.getDeclaredFields();
                 for (Field field : fields) {
                     String timing = (String) field.get(this);
+                    if (timing == null) continue;
                     String whichPrayer = field.getName();
                     Calendar calendar = Calendar.getInstance();
-                    calendar.setTimeInMillis(dayTimestamp);
+                    calendar.setTimeInMillis(dayTimestamp * 1000);
                     int currentMonth = calendar.get(Calendar.MONTH);
                     int currentYear = calendar.get(Calendar.YEAR);
                     int currentDay = calendar.get(Calendar.DAY_OF_MONTH);
-                    calendar.set(currentMonth, currentMonth, currentDay,
+                    calendar.set(currentYear, currentMonth, currentDay,
                             Integer.valueOf(timing.substring(0, 2)),
                             Integer.valueOf(timing.substring(3, 5)));
                     prayerList.add(
