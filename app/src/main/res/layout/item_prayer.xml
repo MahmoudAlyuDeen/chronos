@@ -12,8 +12,10 @@
     android:paddingStart="@dimen/simple_padding_large">
 
     <LinearLayout
+        android:id="@+id/item_prayer_inner_parent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
         android:layout_centerVertical="true"
         android:layout_toStartOf="@+id/item_prayer_timing_text_view"
         android:orientation="horizontal"
@@ -25,28 +27,48 @@
             android:layout_height="@dimen/prayer_logo_size"
             tools:ignore="ContentDescription"/>
 
-        <TextView
-            android:id="@+id/item_prayer_title_text_view"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_marginEnd="@dimen/simple_padding_large"
-            android:layout_marginStart="@dimen/simple_padding_large"
-            android:ellipsize="end"
-            android:gravity="start"
-            android:lines="1"
-            android:text="@string/placeholder"
-            android:textColor="@color/colorTextPrimary"
-            android:textSize="@dimen/text_size_primary"/>
+            android:orientation="vertical"
+            android:paddingEnd="@dimen/simple_padding_large"
+            android:paddingStart="@dimen/simple_padding_large">
+
+            <TextView
+                android:id="@+id/item_prayer_title_text_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:gravity="start"
+                android:lines="1"
+                android:text="@string/placeholder"
+                android:textColor="@color/colorTextPrimary"
+                android:textSize="@dimen/text_size_primary"/>
+
+            <TextView
+                android:id="@+id/item_prayer_subtitle_text_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:gravity="start"
+                android:lines="1"
+                android:text="@string/placeholder"
+                android:textColor="@color/colorTextSecondary"
+                android:textSize="@dimen/text_size_secondary"/>
+
+        </LinearLayout>
+
     </LinearLayout>
 
     <TextView
         android:id="@+id/item_prayer_timing_text_view"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_alignBottom="@id/item_prayer_inner_parent"
         android:layout_alignParentEnd="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="@dimen/simple_padding_medium"
+        android:layout_alignTop="@id/item_prayer_inner_parent"
+        android:layout_centerVertical="true"
         android:lines="1"
         android:text="@string/placeholder_timing"
         android:textColor="@color/colorTextSecondary"

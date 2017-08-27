@@ -21,6 +21,7 @@ public abstract class BaseActivity<V extends MvpView, P extends MvpPresenter<V>>
     protected boolean userInteracted;
 
     protected boolean landscape;
+    protected boolean arabic;
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -59,6 +60,7 @@ public abstract class BaseActivity<V extends MvpView, P extends MvpPresenter<V>>
         Icepick.restoreInstanceState(this, savedInstanceState);
         retainInstance = true;
         landscape = getResources().getBoolean(R.bool.landscape);
+        arabic = getResources().getBoolean(R.bool.arabic);
         if (savedInstanceState == null) {
             viewState = Constants.VIEW_STATE_IDLE;
             userInteracted = false;

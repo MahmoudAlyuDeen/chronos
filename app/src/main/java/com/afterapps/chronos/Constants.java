@@ -4,6 +4,8 @@ package com.afterapps.chronos;
  * Created by mahmoud on 1/12/17.
  */
 
+import java.util.HashMap;
+
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class Constants {
 
@@ -23,4 +25,13 @@ public class Constants {
     public static final int VIEW_STATE_ERROR = 3;
     public static final int VIEW_STATE_ACTION = 4;
     public static final int VIEW_STATE_EMPTY = 5;
+
+    public static final HashMap PRAYER_NAMES = new HashMap<String, String[]>() {{
+        put("fajr", new String[]{"Fajr", "The dawn prayer", "الفجر", ""});
+        put("sunrise", new String[]{"Shurouq", "Sunrise", "الشروق", ""});
+        put("dhuhr", new String[]{"Dhuhr", "The noon prayer", "الظهر", ""});
+        put("asr", new String[]{"Asr", "The afternoon prayer", "العصر", ""});
+        put("maghrib", new String[]{"Maghrib", "The sunset prayer", "المغرب", ""});
+        put("isha", new String[]{"Isha'a", "The night prayer", "العشاء", ""});
+    }};
 }

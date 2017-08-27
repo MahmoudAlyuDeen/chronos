@@ -113,7 +113,7 @@ public class HomeActivity
     }
 
     private void displayPrayerSchedule(List<Prayer> upcomingPrayers) {
-        PrayersAdapter adapter = new PrayersAdapter(this, upcomingPrayers);
+        PrayersAdapter adapter = new PrayersAdapter(this, upcomingPrayers, arabic);
         mHomePrayersRecycler.setAdapter(adapter);
     }
 }

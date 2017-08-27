@@ -8,12 +8,17 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.afterapps.chronos.Constants;
 import com.afterapps.chronos.R;
 import com.afterapps.chronos.beans.Prayer;
 
+import java.text.SimpleDateFormat;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 import butterknife.BindView;
+import butterknife.ButterKnife;
 
 /*
  * Created by mahmoud on 8/27/17.
@@ -23,10 +28,13 @@ class PrayersAdapter extends RecyclerView.Adapter<PrayersAdapter.PrayerViewHolde
 
     private final Context mContext;
     private final List<Prayer> mPrayerList;
+    private final boolean mArabic;
+    private SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm a", Locale.US);
 
-    PrayersAdapter(Context context, List<Prayer> prayerList) {
+    PrayersAdapter(Context context, List<Prayer> prayerList, boolean arabic) {
         mContext = context;
         mPrayerList = prayerList;
+        mArabic = arabic;
     }
 
     @Override
@@ -55,15 +63,24 @@ class PrayersAdapter extends RecyclerView.Adapter<PrayersAdapter.PrayerViewHolde
         ImageView mItemPrayerLogoImageView;
         @BindView(R.id.item_prayer_title_text_view)
         TextView mItemPrayerTitleTextView;
+        @BindView(R.id.item_prayer_subtitle_text_view)
+        TextView mItemPrayerSubtitleTextView;
         @BindView(R.id.item_prayer_timing_text_view)
         TextView mItemPrayerTimingTextView;
 
         PrayerViewHolder(View itemView) {
             super(itemView);
+            ButterKnife.bind(this, itemView);
         }
 
+        @SuppressWarnings({"unchecked"})
         void setPrayer(Prayer prayer) {
-
+            HashMap<String, String[]> prayerNames = Constants.PRAYER_NAMES;
+            String prayerTitle = prayerNames.get(prayer.getWhichPrayer())[mArabic ? 2 : 0];
+            String prayerSubtitle = prayerNames.get(prayer.getWhichPrayer())[mArabic ? 3 : 1];
+            mItemPrayerTitleTextView.setText(prayerTitle);
+            mItemPrayerSubtitleTextView.setText(prayerSubtitle);
+            mItemPrayerTimingTextView.setText(timeFormat.format(prayer.getTimestamp()));
         }
     }
 }
