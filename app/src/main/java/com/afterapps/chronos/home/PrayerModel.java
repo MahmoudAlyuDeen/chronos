@@ -13,16 +13,18 @@ import com.afterapps.chronos.beans.Location;
 import com.afterapps.chronos.beans.Prayer;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import io.realm.Realm;
-import io.realm.RealmResults;
 import io.realm.Sort;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 class PrayerModel {
+
+    private boolean isFetching;
 
     interface PrayerCallback {
         void onLocationError();
@@ -55,17 +57,21 @@ class PrayerModel {
         String timeZoneId = locationDetached.getTimezoneId();
         String signature = timeZoneId + method + school + latitudeMethod;
         List<Prayer> prayersDetached = getPrayers(signature);
-        if (prayersDetached.size() == 0) {
-            fetchPrayers(method, school, latitudeMethod, locationDetached);
-            return;
+        if (prayersDetached.size() < 6) {
+            isFetching = true;
+            fetchPrayers(method, school, latitudeMethod, locationDetached, true);
+            fetchPrayers(method, school, latitudeMethod, locationDetached, false);
+        } else {
+            mPrayerCallback.onPrayersReady(prayersDetached);
         }
-        mPrayerCallback.onPrayersReady(prayersDetached);
     }
 
     private List<Prayer> getPrayers(String signature) {
+        long currentTimestamp = new Date().getTime();
         Realm realm = Realm.getDefaultInstance();
         List<Prayer> prayersDetached = realm.copyFromRealm(realm.where(Prayer.class)
                 .equalTo("signature", signature)
+                .greaterThan("timestamp", currentTimestamp)
                 .findAllSorted("timestamp", Sort.ASCENDING));
         realm.close();
         return prayersDetached;
@@ -74,7 +80,8 @@ class PrayerModel {
     private void fetchPrayers(final int method,
                               final int school,
                               final int latitudeMethod,
-                              final Location locationDetached) {
+                              final Location locationDetached,
+                              final boolean prefetch) {
         Calendar currentTimeCal = Calendar.getInstance();
         int currentMonth = currentTimeCal.get(Calendar.MONTH) + 1;
         int currentYear = currentTimeCal.get(Calendar.YEAR);
@@ -83,8 +90,8 @@ class PrayerModel {
                 locationDetached.getLatitude(),
                 locationDetached.getLongitude(),
                 locationDetached.getTimezoneId(),
-                currentMonth,
-                currentYear,
+                prefetch ? currentMonth == 11 ? currentMonth : currentMonth + 1 : currentMonth,
+                prefetch && currentMonth == 11 ? currentYear + 1 : currentYear,
                 method,
                 school,
                 latitudeMethod
@@ -120,17 +127,20 @@ class PrayerModel {
             realm.executeTransaction(new Realm.Transaction() {
                 @Override
                 public void execute(Realm realm) {
-                    RealmResults<Prayer> oldPrayers = realm.where(Prayer.class).findAll();
-                    oldPrayers.deleteAllFromRealm();
                     realm.copyToRealmOrUpdate(prayers);
                     String timeZoneId = locationDetached.getTimezoneId();
                     String signature = timeZoneId + method + school + latitudeMethod;
                     List<Prayer> prayersDetached = getPrayers(signature);
-                    if (prayersDetached.size() == 0) {
-                        mPrayerCallback.onLogicError();
-                        return;
+
+                    if (isFetching) {
+                        isFetching = false;
+                    } else {
+                        if (prayersDetached.size() == 0) {
+                            mPrayerCallback.onLogicError();
+                            return;
+                        }
+                        mPrayerCallback.onPrayersReady(prayersDetached);
                     }
-                    mPrayerCallback.onPrayersReady(prayersDetached);
                 }
             });
         } catch (IllegalAccessException e) {

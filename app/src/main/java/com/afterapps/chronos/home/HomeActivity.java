@@ -1,16 +1,22 @@
 package com.afterapps.chronos.home;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 
 import com.afterapps.chronos.BaseActivity;
 import com.afterapps.chronos.R;
 import com.afterapps.chronos.beans.Prayer;
+import com.afterapps.chronos.location.LocationActivity;
 
 import java.util.Date;
 import java.util.List;
@@ -24,6 +30,8 @@ public class HomeActivity
 
     @BindView(R.id.home_prayers_recycler)
     RecyclerView mHomePrayersRecycler;
+    @BindView(R.id.home_toolbar)
+    Toolbar mHomeToolbar;
 
     private SharedPreferences mPref;
 
@@ -62,6 +70,7 @@ public class HomeActivity
         setContentView(R.layout.activity_home);
         mPref = PreferenceManager.getDefaultSharedPreferences(this);
         ButterKnife.bind(this);
+        setSupportActionBar(mHomeToolbar);
     }
 
     @Override
@@ -115,5 +124,24 @@ public class HomeActivity
     private void displayPrayerSchedule(List<Prayer> upcomingPrayers) {
         PrayersAdapter adapter = new PrayersAdapter(this, upcomingPrayers, arabic);
         mHomePrayersRecycler.setAdapter(adapter);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_home, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_location:
+                Intent location = new Intent(this, LocationActivity.class);
+                startActivity(location);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }

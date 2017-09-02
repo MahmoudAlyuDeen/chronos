@@ -66,7 +66,7 @@ class HomePresenter extends MvpBasePresenter<HomeView>
         }));
         if (mUpcomingPrayers == null || mUpcomingPrayers.size() != upcomingPrayers.size()) {
             this.mUpcomingPrayers = upcomingPrayers;
-            return upcomingPrayers;
+            return upcomingPrayers.size() >= 6 ? upcomingPrayers.subList(0, 6) : upcomingPrayers;
         } else {
             return null;
         }
