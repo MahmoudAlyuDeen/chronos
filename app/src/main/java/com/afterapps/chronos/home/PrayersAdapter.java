@@ -3,8 +3,10 @@ package com.afterapps.chronos.home;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,22 +34,37 @@ import butterknife.ButterKnife;
 
 class PrayersAdapter extends RecyclerView.Adapter<PrayersAdapter.PrayerViewHolder> {
 
+    private static final int VIEW_TYPE_DEFAULT = 0;
+    private static final int VIEW_TYPE_DAY_SUB_HEADER = 1;
+
     private final Context mContext;
     private final List<Prayer> mPrayerList;
     private final boolean mArabic;
-    private SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm a", Locale.US);
+    private SimpleDateFormat timeFormat;
 
     PrayersAdapter(Context context, List<Prayer> prayerList, boolean arabic) {
         mContext = context;
         mPrayerList = prayerList;
         mArabic = arabic;
+        timeFormat = new SimpleDateFormat("hh:mm a", new Locale(mArabic ? "ar" : "en"));
     }
 
     @Override
     public PrayerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_prayer, parent, false);
+                .inflate(viewType == VIEW_TYPE_DAY_SUB_HEADER ?
+                        R.layout.item_prayer_sub_header : R.layout.item_prayer, parent, false);
         return new PrayerViewHolder(itemView);
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return position == 0 || isFirstInDay(mPrayerList.get(position)) ?
+                VIEW_TYPE_DAY_SUB_HEADER : VIEW_TYPE_DEFAULT;
+    }
+
+    private boolean isFirstInDay(Prayer prayer) {
+        return prayer.getWhichPrayer().equals("fajr");
     }
 
     @Override
@@ -73,6 +90,9 @@ class PrayersAdapter extends RecyclerView.Adapter<PrayersAdapter.PrayerViewHolde
         TextView mItemPrayerSubtitleTextView;
         @BindView(R.id.item_prayer_timing_text_view)
         TextView mItemPrayerTimingTextView;
+        @Nullable
+        @BindView(R.id.item_prayer_day_text_view)
+        TextView mItemPrayerDayTextView;
 
         PrayerViewHolder(View itemView) {
             super(itemView);
@@ -84,6 +104,7 @@ class PrayersAdapter extends RecyclerView.Adapter<PrayersAdapter.PrayerViewHolde
             HashMap<String, String[]> prayerNames = Constants.PRAYER_NAMES;
             String prayerTitle = prayerNames.get(prayer.getWhichPrayer())[mArabic ? 2 : 0];
             String prayerSubtitle = prayerNames.get(prayer.getWhichPrayer())[mArabic ? 3 : 1];
+            String daySubHeaderString = getDayString(prayer);
             IconicsDrawable prayerIcon = getPrayerIcon(prayer);
             int textColor = getTextColor();
             int textStyle = getTextStyle();
@@ -96,6 +117,14 @@ class PrayersAdapter extends RecyclerView.Adapter<PrayersAdapter.PrayerViewHolde
             mItemPrayerTitleTextView.setTextColor(textColor);
             mItemPrayerSubtitleTextView.setTextColor(textColor);
             mItemPrayerTimingTextView.setTextColor(textColor);
+            if (mItemPrayerDayTextView != null) {
+                mItemPrayerDayTextView.setText(daySubHeaderString);
+            }
+        }
+
+        private String getDayString(Prayer prayer) {
+            return mContext.getString(DateUtils.isToday(prayer.getTimestamp()) ?
+                    R.string.sub_header_today : R.string.sub_header_tomorrow);
         }
 
         private int getTextColor() {
@@ -131,7 +160,8 @@ class PrayersAdapter extends RecyclerView.Adapter<PrayersAdapter.PrayerViewHolde
                     prayerIcon.icon(FontAwesome.Icon.faw_moon_o);
                     break;
             }
-            prayerIcon.color(ContextCompat.getColor(mContext, R.color.colorAccent));
+            prayerIcon.color(ContextCompat.getColor(mContext, getAdapterPosition() == 0 ?
+                    R.color.colorAccent : R.color.colorTextPrimary));
             return prayerIcon;
         }
     }

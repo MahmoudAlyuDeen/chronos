@@ -115,7 +115,9 @@ public class HomeActivity
     }
 
     private void filterPrayers() {
-        List<Prayer> upcomingPrayers = presenter.getUpcomingPrayers(mPrayerList, new Date().getTime());
+        List<Prayer> upcomingPrayers = presenter.getUpcomingPrayers(mPrayerList,
+                new Date().getTime(),
+                mHomePrayersRecycler.getAdapter() == null);
         if (upcomingPrayers != null) {
             displayPrayerSchedule(upcomingPrayers);
         }

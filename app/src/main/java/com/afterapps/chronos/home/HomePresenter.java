@@ -57,14 +57,14 @@ class HomePresenter extends MvpBasePresenter<HomeView>
         }
     }
 
-    List<Prayer> getUpcomingPrayers(List<Prayer> prayerList, final long currentTimestamp) {
+    List<Prayer> getUpcomingPrayers(final List<Prayer> prayerList, final long currentTimestamp, boolean forceRefresh) {
         List<Prayer> upcomingPrayers = Lists.newArrayList(Iterables.filter(prayerList, new Predicate<Prayer>() {
             @Override
             public boolean apply(Prayer prayer) {
                 return prayer.getTimestamp() > currentTimestamp;
             }
         }));
-        if (mUpcomingPrayers == null || mUpcomingPrayers.size() != upcomingPrayers.size()) {
+        if (forceRefresh || mUpcomingPrayers == null || mUpcomingPrayers.size() != upcomingPrayers.size()) {
             this.mUpcomingPrayers = upcomingPrayers;
             return upcomingPrayers.size() >= 6 ? upcomingPrayers.subList(0, 6) : upcomingPrayers;
         } else {
