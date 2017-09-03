@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/item_prayer_day_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-medium"
+        android:gravity="center_vertical|start"
+        android:padding="@dimen/simple_padding_large"
+        android:text="@string/placeholder"
+        android:textColor="@color/colorTextSecondary"/>
+
+    <include layout="@layout/item_prayer"/>
+
+</LinearLayout>

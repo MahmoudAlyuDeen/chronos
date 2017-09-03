@@ -25,6 +25,7 @@
             android:id="@+id/item_prayer_logo_image_view"
             android:layout_width="@dimen/prayer_logo_size"
             android:layout_height="@dimen/prayer_logo_size"
+            android:layout_gravity="center_vertical"
             tools:ignore="ContentDescription"/>
 
         <LinearLayout
