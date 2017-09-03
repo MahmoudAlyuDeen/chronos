@@ -23,5 +23,7 @@
 
     <!--home-->
     <dimen name="prayer_logo_size">32dp</dimen>
+    <dimen name="upcoming_prayer_logo_size">48dp</dimen>
+    <dimen name="home_mosque_max_height">150dp</dimen>
 
 </resources>

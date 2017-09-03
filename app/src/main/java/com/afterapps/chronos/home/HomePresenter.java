@@ -1,9 +1,6 @@
 package com.afterapps.chronos.home;
 
 import com.afterapps.chronos.beans.Prayer;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import com.hannesdorfmann.mosby3.mvp.MvpBasePresenter;
 
 import java.util.List;
@@ -16,7 +13,6 @@ class HomePresenter extends MvpBasePresenter<HomeView>
         implements PrayerModel.PrayerCallback {
 
     private PrayerModel mPrayerModel;
-    private List<Prayer> mUpcomingPrayers;
 
     void getPrayers(int method, int school, int latitudeMethod) {
         if (mPrayerModel == null) {
@@ -54,21 +50,6 @@ class HomePresenter extends MvpBasePresenter<HomeView>
     public void onLogicError() {
         if (isViewAttached() && getView() != null) {
             getView().showError();
-        }
-    }
-
-    List<Prayer> getUpcomingPrayers(final List<Prayer> prayerList, final long currentTimestamp, boolean forceRefresh) {
-        List<Prayer> upcomingPrayers = Lists.newArrayList(Iterables.filter(prayerList, new Predicate<Prayer>() {
-            @Override
-            public boolean apply(Prayer prayer) {
-                return prayer.getTimestamp() > currentTimestamp;
-            }
-        }));
-        if (forceRefresh || mUpcomingPrayers == null || mUpcomingPrayers.size() != upcomingPrayers.size()) {
-            this.mUpcomingPrayers = upcomingPrayers;
-            return upcomingPrayers.size() >= 6 ? upcomingPrayers.subList(0, 6) : upcomingPrayers;
-        } else {
-            return null;
         }
     }
 }

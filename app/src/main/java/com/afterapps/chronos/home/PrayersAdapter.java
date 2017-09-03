@@ -161,7 +161,7 @@ class PrayersAdapter extends RecyclerView.Adapter<PrayersAdapter.PrayerViewHolde
                     break;
             }
             prayerIcon.color(ContextCompat.getColor(mContext, getAdapterPosition() == 0 ?
-                    R.color.colorAccent : R.color.colorTextPrimary));
+                    R.color.colorAccent : R.color.colorTextSecondary));
             return prayerIcon;
         }
     }

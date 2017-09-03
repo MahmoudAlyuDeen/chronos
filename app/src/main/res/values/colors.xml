@@ -4,11 +4,16 @@
     <color name="colorPrimaryDark">#512DA8</color>
     <color name="colorAccent">#b39ddb</color>
 
-    <!--opaque black-->
+    <!--text light-->
     <color name="colorTextPrimary">#BF000000</color>
     <color name="colorTextSecondary">#8C000000</color>
     <color name="colorTextHint">#63000000</color>
     <color name="colorDividers">#1B000000</color>
+
+    <!--text dark-->
+    <color name="colorTextPrimaryDark">#FFFFFF</color>
+    <color name="colorTextSecondaryDark">#8CFFFFFF</color>
+    <color name="colorTextHintDark">#63FFFFFF</color>
 
     <!--basic colors-->
     <color name="colorTransparent">#00000000</color>
