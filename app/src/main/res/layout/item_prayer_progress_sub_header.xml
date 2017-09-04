@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <com.elyeproj.loaderviewlibrary.LoaderTextView
+        android:id="@+id/item_prayer_day_text_view"
+        android:layout_width="@dimen/progress_primary_text_size"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/simple_padding_large"
+        android:gravity="center_vertical|start"
+        android:text="@string/empty_string"
+        android:textSize="@dimen/text_size_small"/>
+
+    <include layout="@layout/item_prayer_progress"/>
+
+</LinearLayout>

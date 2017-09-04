@@ -15,7 +15,7 @@
     <string name="night_ar">العشاء</string>
     <string name="sunset_ar">المغرب</string>
     <string name="up_next_subtitle">حتى %1$s</string>
-    <string name="error_connection">مواقيت الصلاة غير متاحة، تأكد من وجود اتصال انترنت.</string>
+    <string name="error_connection_title">مواقيت الصلاة غير متاحة، تأكد من وجود اتصال انترنت.</string>
     <string name="message_city_deleted">تم مسح %1$s</string>
     <string name="preference_dialog_title_latitude">إختر طريقة الحساب</string>
     <string name="preference_dialog_title_method">إختر طريقة الحساب</string>

@@ -6,7 +6,7 @@
     <dimen name="text_size_primary">16sp</dimen>
     <dimen name="text_size_title">18sp</dimen>
     <dimen name="text_size_big">20sp</dimen>
-    <dimen name="text_size_huge">26sp</dimen>
+    <dimen name="text_size_huge">34sp</dimen>
 
     <!--simple padding-->
     <dimen name="simple_padding_tiny">2dp</dimen>
@@ -25,5 +25,8 @@
     <dimen name="prayer_logo_size">32dp</dimen>
     <dimen name="upcoming_prayer_logo_size">48dp</dimen>
     <dimen name="home_mosque_max_height">150dp</dimen>
+    <dimen name="progress_logo_size">38dp</dimen>
+    <dimen name="progress_primary_text_size">96dp</dimen>
+    <dimen name="progress_secondary_text_size">46dp</dimen>
 
 </resources>

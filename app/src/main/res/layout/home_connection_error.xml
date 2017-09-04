@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/home_connection_error_parent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_centerInParent="true"
+    android:fillViewport="true"
+    android:orientation="vertical"
+    android:paddingTop="@dimen/home_mosque_max_height"
+    tools:showIn="@layout/activity_home">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingEnd="@dimen/simple_padding_larger"
+        android:paddingStart="@dimen/simple_padding_larger">
+
+        <ImageView
+            android:layout_width="96dp"
+            android:layout_height="96dp"
+            android:background="@drawable/opaque_circle"
+            android:scaleType="center"
+            android:src="@drawable/ic_connection_error"
+            tools:ignore="ContentDescription"/>
+
+        <android.support.v4.widget.Space
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/simple_padding_larger"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/error_connection_title"
+            android:textColor="@color/colorTextPrimary"
+            android:textSize="@dimen/text_size_big"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/error_connection_prompt"
+            android:textColor="@color/colorTextSecondary"
+            android:textSize="@dimen/text_size_primary"/>
+
+        <android.support.v4.widget.Space
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/simple_padding_larger"/>
+
+        <Button
+            android:id="@+id/home_connection_error_notify_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/action_notify"
+            android:theme="@style/ButtonStyleSolid"/>
+
+        <Button
+            android:id="@+id/home_connection_error_retry_button"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/action_retry"
+            android:theme="@style/ButtonStyleHollow"/>
+
+    </LinearLayout>
+
+</android.support.v4.widget.NestedScrollView>

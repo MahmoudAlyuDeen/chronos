@@ -11,6 +11,8 @@ public class Constants {
 
     public static final String PLAY_SERVICES_LINK = "https://play.google.com/store/apps/details?id=com.google.android.gms";
 
+    public static final String LOCATION_OPENED_FROM_EMPTY_STATE = "locationOpenedFromEmptyState";
+
     private Constants() {
     }
 

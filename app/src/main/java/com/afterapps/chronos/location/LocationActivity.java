@@ -60,6 +60,7 @@ public class LocationActivity
         ButterKnife.bind(this);
         setSupportActionBar(mPlacesToolbar);
         mLocationsRecycler.setNestedScrollingEnabled(false);
+        //todo: check if directed from empty state
     }
 
     @Override

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/item_prayer_progress_parent"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_alignParentStart="true"
+    android:padding="@dimen/simple_padding_large"
+    android:layout_centerVertical="true"
+    android:minHeight="?attr/listPreferredItemHeight"
+    android:orientation="horizontal"
+    tools:ignore="UseCompoundDrawables">
+
+    <com.elyeproj.loaderviewlibrary.LoaderImageView
+        android:id="@+id/item_prayer_logo_image_view"
+        android:layout_width="@dimen/progress_logo_size"
+        android:layout_height="@dimen/progress_logo_size"
+        android:layout_gravity="center_vertical"
+        android:layout_marginEnd="@dimen/simple_padding_large"
+        tools:ignore="ContentDescription"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center_vertical"
+        android:gravity="start"
+        android:orientation="horizontal">
+
+        <com.elyeproj.loaderviewlibrary.LoaderTextView
+            android:id="@+id/item_prayer_title_text_view"
+            android:layout_width="@dimen/progress_primary_text_size"
+            android:layout_height="wrap_content"
+            android:text="@string/empty_string"
+            android:textSize="@dimen/text_size_small"/>
+
+        <android.support.v4.widget.Space
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
+
+        <com.elyeproj.loaderviewlibrary.LoaderTextView
+            android:id="@+id/item_prayer_subtitle_text_view"
+            android:layout_width="@dimen/progress_secondary_text_size"
+            android:layout_height="wrap_content"
+            android:text="@string/empty_string"
+            android:textSize="@dimen/text_size_small"/>
+
+    </LinearLayout>
+
+</LinearLayout>

@@ -114,6 +114,7 @@ class PrayersAdapter extends RecyclerView.Adapter<PrayersAdapter.PrayerViewHolde
             mItemPrayerLogoImageView.setImageDrawable(prayerIcon);
             mItemPrayerTitleTextView.setTypeface(null, textStyle);
             mItemPrayerSubtitleTextView.setTypeface(null, textStyle);
+            mItemPrayerTimingTextView.setTypeface(null, textStyle);
             mItemPrayerTitleTextView.setTextColor(textColor);
             mItemPrayerSubtitleTextView.setTextColor(textColor);
             mItemPrayerTimingTextView.setTextColor(textColor);

@@ -102,6 +102,6 @@ public abstract class BaseActivity<V extends MvpView, P extends MvpPresenter<V>>
     }
 
     public void showConnectionError() {
-        Toast.makeText(this, R.string.error_connection, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, R.string.error_connection_title, Toast.LENGTH_SHORT).show();
     }
 }
