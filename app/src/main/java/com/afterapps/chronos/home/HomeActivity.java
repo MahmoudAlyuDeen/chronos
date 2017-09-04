@@ -12,6 +12,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -121,9 +122,11 @@ public class HomeActivity
         mUpcomingPrayer = null;
         mUpcomingPrayers = null;
         mPrayerList = null;
+        mUpcomingLogo = null;
         if (mPref != null) {
             mPref.unregisterOnSharedPreferenceChangeListener(this);
         }
+        mHomeAppBarLogoImageView.setAlpha(0f);
     }
 
     @NonNull
@@ -143,6 +146,7 @@ public class HomeActivity
 
     @Override
     protected void displayViewState() {
+        Log.d("@@@@", "displayViewState: " + viewState);
         mHomePrayersRecycler.setVisibility(GONE);
         mHomeAppBarTextParent.setVisibility(GONE);
         mHomeEmptyStateParent.setVisibility(GONE);
@@ -164,9 +168,10 @@ public class HomeActivity
                 mHomeEmptyStateParent.setVisibility(VISIBLE);
                 break;
             case Constants.VIEW_STATE_ACTION:
+                mHomeConnectionErrorParent.setVisibility(VISIBLE);
                 break;
             case Constants.VIEW_STATE_ERROR:
-                mHomeConnectionErrorParent.setVisibility(VISIBLE);
+
                 break;
         }
     }
