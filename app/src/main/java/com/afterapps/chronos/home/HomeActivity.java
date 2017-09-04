@@ -35,6 +35,7 @@ import com.mikepenz.iconics.IconicsDrawable;
 import com.mikepenz.weather_icons_typeface_library.WeatherIcons;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -166,8 +167,14 @@ public class HomeActivity
             showError();
             return;
         }
-        if (mUpcomingPrayer == null || mUpcomingPrayer != allUpcomingPrayers.get(0)) {
-            displayUpcomingLogo(mUpcomingPrayer == null);
+        final Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        final long midnightTimestamp = calendar.getTimeInMillis();
+        if (mUpcomingPrayer == null || mUpcomingPrayer != allUpcomingPrayers.get(0)
+                || currentTimestamp == midnightTimestamp) {
+            displayUpcomingLogo(mUpcomingPrayer == null, midnightTimestamp);
             mUpcomingPrayer = allUpcomingPrayers.get(0);
         }
         displayUpcomingPrayer();
@@ -179,8 +186,8 @@ public class HomeActivity
         }
     }
 
-    private void displayUpcomingLogo(final boolean firstTime) {
-        IconicsDrawable upcomingLogo = getDayTimeLogo();
+    private void displayUpcomingLogo(final boolean firstTime, final long midnightTimestamp) {
+        IconicsDrawable upcomingLogo = getDayTimeLogo(midnightTimestamp);
         if (upcomingLogo == null) {
             return;
         }
@@ -199,7 +206,7 @@ public class HomeActivity
                     .addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                         @Override
                         public void onGlobalLayout() {
-                            displayUpcomingLogo(firstTime);
+                            displayUpcomingLogo(firstTime, midnightTimestamp);
                             mHomeAppBarLogoImageView.getViewTreeObserver()
                                     .removeOnGlobalLayoutListener(this);
                         }
@@ -260,10 +267,8 @@ public class HomeActivity
     }
 
     @Nullable
-    private IconicsDrawable getDayTimeLogo() {
+    private IconicsDrawable getDayTimeLogo(final long midnightTimestamp) {
         final long currentTimestamp = new Date().getTime();
-        //todo: GMT midnight!
-        final long midnightTimestamp = currentTimestamp - (currentTimestamp % (24 * 60 * 60 * 1000));
         final long nextMidnightTimestamp = midnightTimestamp + 24 * 60 * 60 * 1000;
         final List<Prayer> todayPrayers =
                 Lists.newArrayList(Iterables.filter(mPrayerList, new Predicate<Prayer>() {
@@ -275,6 +280,8 @@ public class HomeActivity
                 }));
         //todo: else executes!
         if (todayPrayers.size() < 6) {
+            return null;
+        } else {
             final long sunriseTimestamp = todayPrayers.get(1).getTimestamp();
             final long sunsetTimestamp = todayPrayers.get(4).getTimestamp();
 
@@ -287,8 +294,6 @@ public class HomeActivity
                 dayTimeLogo.icon(WeatherIcons.Icon.wic_day_sunny);
             }
             return dayTimeLogo;
-        } else {
-            return null;
         }
     }
 
