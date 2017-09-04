@@ -1,19 +1,25 @@
 package com.afterapps.chronos.home;
 
+import android.animation.Animator;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.ViewTreeObserver;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.afterapps.chronos.BaseActivity;
@@ -24,6 +30,9 @@ import com.afterapps.chronos.location.LocationActivity;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.mikepenz.fontawesome_typeface_library.FontAwesome;
+import com.mikepenz.iconics.IconicsDrawable;
+import com.mikepenz.weather_icons_typeface_library.WeatherIcons;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -49,8 +58,10 @@ public class HomeActivity
     TextView mHomeAppBarTimingSubtitleTextView;
     @BindView(R.id.home_app_bar_text_parent)
     LinearLayout mHomeAppBarTextParent;
-    @BindView(R.id.home_app_bar_icon_image_view)
-    ImageView mHomeAppBarIconImageView;
+    @BindView(R.id.home_app_bar_logo_image_view)
+    ImageView mHomeAppBarLogoImageView;
+    @BindView(R.id.home_app_bar_mosque_image_view)
+    ImageView mHomeAppBarMosqueImageView;
 
     private SharedPreferences mPref;
 
@@ -63,6 +74,7 @@ public class HomeActivity
 
     private List<Prayer> mUpcomingPrayers;
     private Prayer mUpcomingPrayer;
+    private IconicsDrawable mUpcomingLogo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,9 +115,9 @@ public class HomeActivity
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (mPref == null) return;
-        int method = mPref.getInt(getString(R.string.preference_key_method), 5);
-        int school = mPref.getInt(getString(R.string.preference_key_school), 0);
-        int latitudeMethod = mPref.getInt(getString(R.string.preference_key_latitude), 3);
+        final int method = mPref.getInt(getString(R.string.preference_key_method), 5);
+        final int school = mPref.getInt(getString(R.string.preference_key_school), 0);
+        final int latitudeMethod = mPref.getInt(getString(R.string.preference_key_latitude), 3);
         presenter.getPrayers(method, school, latitudeMethod);
     }
 
@@ -115,8 +127,8 @@ public class HomeActivity
     }
 
     @Override
-    public void onPrayersReady(List<Prayer> upcomingPrayersDetached) {
-        mPrayerList = upcomingPrayersDetached;
+    public void onPrayersReady(List<Prayer> prayersDetached) {
+        mPrayerList = prayersDetached;
         startTicking();
     }
 
@@ -150,26 +162,68 @@ public class HomeActivity
                         return prayer.getTimestamp() > currentTimestamp;
                     }
                 }));
-        List<Prayer> upcomingPrayers = allUpcomingPrayers.size() >= 6 ?
-                allUpcomingPrayers.subList(0, 6) : allUpcomingPrayers;
-        if (upcomingPrayers.isEmpty()) {
+        if (allUpcomingPrayers.isEmpty()) {
             showError();
             return;
         }
-        if (mUpcomingPrayers == null || mUpcomingPrayers.size() != upcomingPrayers.size()) {
-            mUpcomingPrayers = upcomingPrayers;
-            displayPrayerSchedule();
-        }
-        if (mUpcomingPrayer == null || mUpcomingPrayer != upcomingPrayers.get(0)) {
-            displayUpcomingLogo(upcomingPrayers.get(0), mUpcomingPrayer == null);
-            mUpcomingPrayer = upcomingPrayers.get(0);
+        if (mUpcomingPrayer == null || mUpcomingPrayer != allUpcomingPrayers.get(0)) {
+            displayUpcomingLogo(mUpcomingPrayer == null);
+            mUpcomingPrayer = allUpcomingPrayers.get(0);
         }
         displayUpcomingPrayer();
+        if (mUpcomingPrayers == null || mUpcomingPrayers.size() != allUpcomingPrayers.size()) {
+            mUpcomingPrayers = allUpcomingPrayers;
+            final List<Prayer> upcomingPrayersTillTomorrow = allUpcomingPrayers.size() >= 6 ?
+                    allUpcomingPrayers.subList(0, 6) : allUpcomingPrayers;
+            displayPrayerSchedule(upcomingPrayersTillTomorrow);
+        }
     }
 
-    private void displayUpcomingLogo(Prayer upcomingPrayer, boolean firstTime) {
-        Log.d("@@@@", "displayUpcomingLogo, prayer: " + upcomingPrayer.getWhichPrayer());
-        Log.d("@@@@", "displayUpcomingLogo, firstTime: " + firstTime);
+    private void displayUpcomingLogo(final boolean firstTime) {
+        IconicsDrawable upcomingLogo = getDayTimeLogo();
+        if (upcomingLogo == null) {
+            return;
+        }
+        if (mUpcomingLogo != null && mUpcomingLogo.getIcon() == upcomingLogo.getIcon()) {
+            return;
+        }
+        mUpcomingLogo = upcomingLogo;
+        final int mosqueWidth = mHomeAppBarMosqueImageView.getWidth();
+        final int mosqueHeight = mHomeAppBarMosqueImageView.getHeight();
+        final int logoSize = mosqueWidth / 7;
+        final int iconRightRightMargin = (int) (mosqueWidth / 3.5);
+
+        if (mosqueHeight == 0) {
+            mUpcomingLogo = null;
+            mHomeAppBarMosqueImageView.getViewTreeObserver()
+                    .addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                        @Override
+                        public void onGlobalLayout() {
+                            displayUpcomingLogo(firstTime);
+                            mHomeAppBarLogoImageView.getViewTreeObserver()
+                                    .removeOnGlobalLayoutListener(this);
+                        }
+                    });
+            return;
+        }
+
+        final int displacement = mosqueHeight / 2;
+
+        final RelativeLayout.LayoutParams layoutParams =
+                new RelativeLayout.LayoutParams(logoSize, logoSize);
+        layoutParams.setMargins(0, 0, iconRightRightMargin, 0);
+
+        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
+        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+
+        mHomeAppBarLogoImageView.setLayoutParams(layoutParams);
+
+        if (firstTime) {
+            mHomeAppBarLogoImageView.setImageDrawable(mUpcomingLogo);
+            startRiseAnimation(displacement, mHomeAppBarLogoImageView);
+        } else {
+            startChainedSetRiseAnimation(displacement, mUpcomingLogo, mHomeAppBarLogoImageView);
+        }
     }
 
     @SuppressWarnings({"unchecked"})
@@ -181,14 +235,14 @@ public class HomeActivity
         mHomeAppBarTimingSubtitleTextView.setText(getString(R.string.up_next_subtitle, prayerTitle));
     }
 
-    private void displayPrayerSchedule() {
-        PrayersAdapter adapter = new PrayersAdapter(this, mUpcomingPrayers, arabic);
+    private void displayPrayerSchedule(List<Prayer> upcomingPrayersTillTomorrow) {
+        final PrayersAdapter adapter = new PrayersAdapter(this, upcomingPrayersTillTomorrow, arabic);
         mHomePrayersRecycler.setAdapter(adapter);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
+        final MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_home, menu);
         return true;
     }
@@ -197,11 +251,107 @@ public class HomeActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_location:
-                Intent location = new Intent(this, LocationActivity.class);
+                final Intent location = new Intent(this, LocationActivity.class);
                 startActivity(location);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Nullable
+    private IconicsDrawable getDayTimeLogo() {
+        final long currentTimestamp = new Date().getTime();
+        //todo: GMT midnight!
+        final long midnightTimestamp = currentTimestamp - (currentTimestamp % (24 * 60 * 60 * 1000));
+        final long nextMidnightTimestamp = midnightTimestamp + 24 * 60 * 60 * 1000;
+        final List<Prayer> todayPrayers =
+                Lists.newArrayList(Iterables.filter(mPrayerList, new Predicate<Prayer>() {
+                    @Override
+                    public boolean apply(Prayer prayer) {
+                        return prayer.getTimestamp() > midnightTimestamp &&
+                                prayer.getTimestamp() < nextMidnightTimestamp;
+                    }
+                }));
+        //todo: else executes!
+        if (todayPrayers.size() < 6) {
+            final long sunriseTimestamp = todayPrayers.get(1).getTimestamp();
+            final long sunsetTimestamp = todayPrayers.get(4).getTimestamp();
+
+            final IconicsDrawable dayTimeLogo = new IconicsDrawable(this).color(Color.WHITE);
+            if (currentTimestamp < sunriseTimestamp) {
+                dayTimeLogo.icon(WeatherIcons.Icon.wic_stars);
+            } else if (currentTimestamp > sunsetTimestamp) {
+                dayTimeLogo.icon(FontAwesome.Icon.faw_moon_o);
+            } else {
+                dayTimeLogo.icon(WeatherIcons.Icon.wic_day_sunny);
+            }
+            return dayTimeLogo;
+        } else {
+            return null;
+        }
+    }
+
+    private void startChainedSetRiseAnimation(final int displacement,
+                                              final IconicsDrawable newIcon,
+                                              final ImageView animatingImageView) {
+        animatingImageView.animate()
+                .alpha(0)
+                .translationYBy(displacement * 8)
+                .setDuration(3000)
+                .setInterpolator(new AccelerateDecelerateInterpolator())
+                .setListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        animatingImageView.setImageDrawable(newIcon);
+                        startRiseAnimation(displacement, animatingImageView);
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animation) {
+
+                    }
+                });
+    }
+
+    private void startRiseAnimation(final int displacement, final ImageView animatingImageView) {
+        animatingImageView.setTranslationY(0);
+        animatingImageView.setAlpha((float) 0);
+        animatingImageView.animate()
+                .alpha(1)
+                .translationYBy(-displacement)
+                .setDuration(1500)
+                .setInterpolator(new AccelerateDecelerateInterpolator())
+                .setListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        animation.cancel();
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animation) {
+
+                    }
+                });
     }
 }

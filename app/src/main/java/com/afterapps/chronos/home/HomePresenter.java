@@ -25,9 +25,9 @@ class HomePresenter extends MvpBasePresenter<HomeView>
     }
 
     @Override
-    public void onPrayersReady(List<Prayer> upcomingPrayersDetached) {
+    public void onPrayersReady(List<Prayer> prayersDetached) {
         if (isViewAttached() && getView() != null) {
-            getView().onPrayersReady(upcomingPrayersDetached);
+            getView().onPrayersReady(prayersDetached);
             getView().showContent();
         }
     }

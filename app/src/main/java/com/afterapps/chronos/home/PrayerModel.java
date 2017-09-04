@@ -13,7 +13,6 @@ import com.afterapps.chronos.beans.Location;
 import com.afterapps.chronos.beans.Prayer;
 
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 import io.realm.Realm;
@@ -29,7 +28,7 @@ class PrayerModel {
     interface PrayerCallback {
         void onLocationError();
 
-        void onPrayersReady(List<Prayer> upcomingPrayersDetached);
+        void onPrayersReady(List<Prayer> prayersDetached);
 
         void onConnectionError();
 
@@ -67,11 +66,9 @@ class PrayerModel {
     }
 
     private List<Prayer> getPrayers(String signature) {
-        long currentTimestamp = new Date().getTime();
         Realm realm = Realm.getDefaultInstance();
         List<Prayer> prayersDetached = realm.copyFromRealm(realm.where(Prayer.class)
                 .equalTo("signature", signature)
-                .greaterThan("timestamp", currentTimestamp)
                 .findAllSorted("timestamp", Sort.ASCENDING));
         realm.close();
         return prayersDetached;
@@ -82,10 +79,10 @@ class PrayerModel {
                               final int latitudeMethod,
                               final Location locationDetached,
                               final boolean prefetch) {
-        Calendar currentTimeCal = Calendar.getInstance();
-        int currentMonth = currentTimeCal.get(Calendar.MONTH) + 1;
-        int currentYear = currentTimeCal.get(Calendar.YEAR);
-        TimingsService timingsService = ServiceGenerator.createTimingsService();
+        final Calendar currentTimeCal = Calendar.getInstance();
+        final int currentMonth = currentTimeCal.get(Calendar.MONTH) + 1;
+        final int currentYear = currentTimeCal.get(Calendar.YEAR);
+        final TimingsService timingsService = ServiceGenerator.createTimingsService();
         Call<TimingsResponse> timingsCall = timingsService.getTimings(
                 locationDetached.getLatitude(),
                 locationDetached.getLongitude(),
