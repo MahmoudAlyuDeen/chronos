@@ -40,7 +40,7 @@ class PrayersAdapter extends RecyclerView.Adapter<PrayersAdapter.PrayerViewHolde
     private final Context mContext;
     private final List<Prayer> mPrayerList;
     private final boolean mArabic;
-    private SimpleDateFormat timeFormat;
+    private final SimpleDateFormat timeFormat;
 
     PrayersAdapter(Context context, List<Prayer> prayerList, boolean arabic) {
         mContext = context;
@@ -51,7 +51,7 @@ class PrayersAdapter extends RecyclerView.Adapter<PrayersAdapter.PrayerViewHolde
 
     @Override
     public PrayerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext())
+        final View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(viewType == VIEW_TYPE_DAY_SUB_HEADER ?
                         R.layout.item_prayer_sub_header : R.layout.item_prayer, parent, false);
         return new PrayerViewHolder(itemView);
@@ -101,13 +101,13 @@ class PrayersAdapter extends RecyclerView.Adapter<PrayersAdapter.PrayerViewHolde
 
         @SuppressWarnings({"unchecked"})
         void setPrayer(Prayer prayer) {
-            HashMap<String, String[]> prayerNames = Constants.PRAYER_NAMES;
-            String prayerTitle = prayerNames.get(prayer.getWhichPrayer())[mArabic ? 2 : 0];
-            String prayerSubtitle = prayerNames.get(prayer.getWhichPrayer())[mArabic ? 3 : 1];
-            String daySubHeaderString = getDayString(prayer);
-            IconicsDrawable prayerIcon = getPrayerIcon(prayer);
-            int textColor = getTextColor();
-            int textStyle = getTextStyle();
+            final HashMap<String, String[]> prayerNames = Constants.PRAYER_NAMES;
+            final String prayerTitle = prayerNames.get(prayer.getWhichPrayer())[mArabic ? 2 : 0];
+            final String prayerSubtitle = prayerNames.get(prayer.getWhichPrayer())[mArabic ? 3 : 1];
+            final String daySubHeaderString = getDayString(prayer);
+            final IconicsDrawable prayerIcon = getPrayerIcon(prayer);
+            final int textColor = getTextColor();
+            final int textStyle = getTextStyle();
             mItemPrayerTitleTextView.setText(prayerTitle);
             mItemPrayerSubtitleTextView.setText(prayerSubtitle);
             mItemPrayerTimingTextView.setText(timeFormat.format(prayer.getTimestamp()));
@@ -140,7 +140,7 @@ class PrayersAdapter extends RecyclerView.Adapter<PrayersAdapter.PrayerViewHolde
 
         @NonNull
         private IconicsDrawable getPrayerIcon(Prayer prayer) {
-            IconicsDrawable prayerIcon = new IconicsDrawable(mContext);
+            final IconicsDrawable prayerIcon = new IconicsDrawable(mContext);
             switch (prayer.getWhichPrayer()) {
                 case "fajr":
                     prayerIcon.icon(WeatherIcons.Icon.wic_stars);

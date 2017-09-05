@@ -42,8 +42,8 @@ class PrayerModel {
     }
 
     void getPrayers(int method, int school, int latitudeMethod) {
-        Realm realm = Realm.getDefaultInstance();
-        Location location = realm.where(Location.class)
+        final Realm realm = Realm.getDefaultInstance();
+        final Location location = realm.where(Location.class)
                 .equalTo("selected", true)
                 .findFirst();
         if (location == null) {
@@ -53,8 +53,8 @@ class PrayerModel {
         }
         Location locationDetached = realm.copyFromRealm(location);
         realm.close();
-        String timeZoneId = locationDetached.getTimezoneId();
-        String signature = timeZoneId + method + school + latitudeMethod;
+        final String timeZoneId = locationDetached.getTimezoneId();
+        final String signature = timeZoneId + method + school + latitudeMethod;
         List<Prayer> prayersDetached = getPrayers(signature);
         if (prayersDetached.size() < 6) {
             isFetching = true;
