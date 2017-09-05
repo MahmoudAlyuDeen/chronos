@@ -65,7 +65,11 @@ public class LocationActivity
         ButterKnife.bind(this);
         setSupportActionBar(mPlacesToolbar);
         mLocationsRecycler.setNestedScrollingEnabled(false);
-        //todo: check if directed from empty state
+        if (savedInstanceState == null) {
+            if (getIntent().getBooleanExtra(Constants.FROM_ON_BOARDING, false)) {
+                showLocationMethodDialog();
+            }
+        }
     }
 
     @Override

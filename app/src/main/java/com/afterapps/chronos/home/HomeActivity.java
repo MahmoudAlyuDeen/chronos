@@ -51,7 +51,7 @@ import icepick.State;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
-import static com.afterapps.chronos.Constants.LOCATION_OPENED_FROM_EMPTY_STATE;
+import static com.afterapps.chronos.Constants.FROM_ON_BOARDING;
 
 public class HomeActivity
         extends BaseActivity<HomeView, HomePresenter>
@@ -348,7 +348,7 @@ public class HomeActivity
         switch (view.getId()) {
             case R.id.home_empty_state_add_location_button:
                 final Intent location = new Intent(this, LocationActivity.class);
-                location.putExtra(LOCATION_OPENED_FROM_EMPTY_STATE, true);
+                location.putExtra(FROM_ON_BOARDING, true);
                 startActivity(location);
                 break;
             case R.id.home_connection_error_notify_button:
