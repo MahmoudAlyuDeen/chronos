@@ -6,7 +6,10 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:clickable="true"
-    android:padding="@dimen/simple_padding_largish">
+    android:paddingBottom="@dimen/simple_padding_largish"
+    android:paddingEnd="@dimen/simple_padding_large"
+    android:paddingStart="@dimen/simple_padding_large"
+    android:paddingTop="@dimen/simple_padding_largish">
 
     <LinearLayout
         android:id="@+id/item_prayer_inner_parent"
