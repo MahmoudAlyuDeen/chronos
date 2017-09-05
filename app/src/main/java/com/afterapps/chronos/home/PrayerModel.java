@@ -66,9 +66,15 @@ class PrayerModel {
     }
 
     private List<Prayer> getPrayers(String signature) {
+        final Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        final long midnightTimestamp = calendar.getTimeInMillis();
         Realm realm = Realm.getDefaultInstance();
         List<Prayer> prayersDetached = realm.copyFromRealm(realm.where(Prayer.class)
                 .equalTo("signature", signature)
+                .greaterThan("timestamp", midnightTimestamp)
                 .findAllSorted("timestamp", Sort.ASCENDING));
         realm.close();
         return prayersDetached;

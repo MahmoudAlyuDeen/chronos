@@ -44,7 +44,7 @@ public abstract class BaseLocationActivity<V extends MvpView, P extends MvpPrese
     private static final int REQUEST_CHECK_SETTINGS = 2;
 
     @State
-    boolean askedForLocationPermission;
+    protected boolean askedForLocationPermission;
 
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;

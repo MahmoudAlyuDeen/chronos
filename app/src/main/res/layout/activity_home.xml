@@ -22,4 +22,6 @@
 
     <include layout="@layout/home_connection_error"/>
 
+    <include layout="@layout/home_logic_error"/>
+
 </android.support.design.widget.CoordinatorLayout>

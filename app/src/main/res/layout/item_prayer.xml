@@ -5,11 +5,8 @@
     android:id="@+id/item_prayer_parent"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:foreground="?attr/selectableItemBackground"
-    android:minHeight="?attr/listPreferredItemHeight"
-    android:orientation="horizontal"
-    android:paddingEnd="@dimen/simple_padding_large"
-    android:paddingStart="@dimen/simple_padding_large">
+    android:clickable="true"
+    android:padding="@dimen/simple_padding_largish">
 
     <LinearLayout
         android:id="@+id/item_prayer_inner_parent"

@@ -12,7 +12,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -48,6 +47,7 @@ import java.util.TimeZone;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import icepick.State;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
@@ -81,6 +81,16 @@ public class HomeActivity
     Button mHomeConnectionErrorRetryButton;
     @BindView(R.id.home_connection_error_parent)
     NestedScrollView mHomeConnectionErrorParent;
+    @BindView(R.id.home_logic_error_clear_button)
+    Button mHomeLogicErrorClearButton;
+    @BindView(R.id.home_logic_error_restart_button)
+    Button mHomeLogicErrorRestartButton;
+    @BindView(R.id.home_connection_error_prompt_parent)
+    LinearLayout mHomeConnectionErrorPromptParent;
+    @BindView(R.id.home_connection_error_notify_confirmation_text_view)
+    TextView mHomeConnectionErrorNotifyConfirmationTextView;
+    @BindView(R.id.home_logic_error_parent)
+    NestedScrollView mHomeLogicErrorParent;
 
     private SharedPreferences mPref;
 
@@ -94,6 +104,9 @@ public class HomeActivity
 
     private Prayer mUpcomingPrayer;
     private IconicsDrawable mUpcomingLogo;
+
+    @State
+    boolean mConnectionErrorNotifyConfirmed;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -146,11 +159,13 @@ public class HomeActivity
 
     @Override
     protected void displayViewState() {
-        Log.d("@@@@", "displayViewState: " + viewState);
         mHomePrayersRecycler.setVisibility(GONE);
         mHomeAppBarTextParent.setVisibility(GONE);
         mHomeEmptyStateParent.setVisibility(GONE);
         mHomeConnectionErrorParent.setVisibility(GONE);
+        mHomeConnectionErrorPromptParent.setVisibility(GONE);
+        mHomeConnectionErrorNotifyConfirmationTextView.setVisibility(GONE);
+        mHomeLogicErrorParent.setVisibility(GONE);
         switch (viewState) {
             case Constants.VIEW_STATE_PROGRESS:
                 ProgressAdapter adapter = new ProgressAdapter();
@@ -169,9 +184,14 @@ public class HomeActivity
                 break;
             case Constants.VIEW_STATE_ACTION:
                 mHomeConnectionErrorParent.setVisibility(VISIBLE);
+                if (mConnectionErrorNotifyConfirmed) {
+                    mHomeConnectionErrorNotifyConfirmationTextView.setVisibility(VISIBLE);
+                } else {
+                    mHomeConnectionErrorPromptParent.setVisibility(VISIBLE);
+                }
                 break;
             case Constants.VIEW_STATE_ERROR:
-
+                mHomeLogicErrorParent.setVisibility(VISIBLE);
                 break;
         }
     }
@@ -179,6 +199,7 @@ public class HomeActivity
     @Override
     public void onPrayersReady(List<Prayer> prayersDetached) {
         mPrayerList = prayersDetached;
+        updateHomeScreenWidget();
         startTicking();
     }
 
@@ -247,7 +268,7 @@ public class HomeActivity
         final int mosqueWidth = mHomeAppBarMosqueImageView.getWidth();
         final int mosqueHeight = mHomeAppBarMosqueImageView.getHeight();
         final int logoSize = mosqueWidth / 7;
-        final int iconRightRightMargin = (int) (mosqueWidth / 3.5);
+        final int iconEndMargin = (int) (mosqueWidth / 3.5);
 
         if (mosqueHeight == 0) {
             mUpcomingLogo = null;
@@ -267,9 +288,12 @@ public class HomeActivity
 
         final RelativeLayout.LayoutParams layoutParams =
                 new RelativeLayout.LayoutParams(logoSize, logoSize);
-        layoutParams.setMargins(0, 0, iconRightRightMargin, 0);
+        layoutParams.setMargins(arabic ? iconEndMargin : 0,
+                0,
+                arabic ? 0 : iconEndMargin,
+                0);
 
-        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
+        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_END, RelativeLayout.TRUE);
         layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
 
         mHomeAppBarLogoImageView.setLayoutParams(layoutParams);
@@ -317,7 +341,9 @@ public class HomeActivity
 
     @OnClick({R.id.home_empty_state_add_location_button,
             R.id.home_connection_error_notify_button,
-            R.id.home_connection_error_retry_button})
+            R.id.home_connection_error_retry_button,
+            R.id.home_logic_error_clear_button,
+            R.id.home_logic_error_restart_button})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.home_empty_state_add_location_button:
@@ -327,9 +353,17 @@ public class HomeActivity
                 break;
             case R.id.home_connection_error_notify_button:
                 //todo: schedule fetching and notification
+                mConnectionErrorNotifyConfirmed = true;
+                displayViewState();
                 break;
             case R.id.home_connection_error_retry_button:
-                //todo: reattempt synchronous fetching
+                onSharedPreferenceChanged(mPref, "");
+                break;
+            case R.id.home_logic_error_clear_button:
+                //todo
+                break;
+            case R.id.home_logic_error_restart_button:
+                //todo
                 break;
         }
     }

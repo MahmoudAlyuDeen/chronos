@@ -90,5 +90,13 @@
     <string name="error_location_detection">Couldn\'t detect your location</string>
     <string name="action_location_manual">Search</string>
     <string name="up_next_mosque_anchor">000000</string>
+    <string name="error_logic_title">Something went wrong</string>
+    <string name="error_logic_prompt">We\'re looking into the problem, please bare with us. Would you like to clear the database and try again?</string>
+    <string name="action_clear">Clear</string>
+    <string name="action_restart">Restart</string>
+    <string name="error_connection_notify_confirmation">You will be notified when prayers are available</string>
+
+    <!--home screen widget-->
+    <string name="empty_state_widget">Prayers not loaded yet. Tap to open the app</string>
 
 </resources>

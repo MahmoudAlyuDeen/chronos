@@ -26,15 +26,20 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.util.List;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.realm.OrderedRealmCollection;
 import io.realm.Realm;
+import pub.devrel.easypermissions.EasyPermissions;
 
 public class LocationActivity
         extends BaseLocationActivity<LocationView, LocationPresenter>
-        implements LocationView, MaterialDialog.SingleButtonCallback {
+        implements LocationView,
+        MaterialDialog.SingleButtonCallback,
+        EasyPermissions.PermissionCallbacks {
 
     private static final int RC_PLACES_AUTO_COMPLETE_OVERLAY = 1;
 
@@ -86,6 +91,10 @@ public class LocationActivity
 
     @OnClick(R.id.location_add)
     public void onViewClicked() {
+        showLocationMethodDialog();
+    }
+
+    private void showLocationMethodDialog() {
         new MaterialDialog.Builder(this)
                 .title(R.string.dialog_title_location_method)
                 .content(R.string.dialog_content_location_method)
@@ -101,6 +110,7 @@ public class LocationActivity
     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
         switch (which) {
             case POSITIVE:
+                askedForLocationPermission = false;
                 connectLocationClient();
                 break;
             case NEGATIVE:
@@ -161,7 +171,6 @@ public class LocationActivity
         finish();
     }
 
-
     @Override
     protected void showLocationDetectionError() {
         Snackbar.make(mLocationsRecycler, R.string.error_location_detection, Snackbar.LENGTH_INDEFINITE)
@@ -176,5 +185,23 @@ public class LocationActivity
     @Override
     public void onLocationError() {
         showLocationDetectionError();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+    }
+
+    @Override
+    public void onPermissionsGranted(int requestCode, List<String> perms) {
+        checkLocationPermissionAndRequestLocation();
+    }
+
+    @Override
+    public void onPermissionsDenied(int requestCode, List<String> perms) {
+        showLocationMethodDialog();
     }
 }

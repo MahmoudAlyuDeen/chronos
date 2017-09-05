@@ -41,6 +41,7 @@ class PrayersProvider implements RemoteViewsService.RemoteViewsFactory {
     private final boolean mArabic;
     private final SimpleDateFormat timeFormat;
 
+    @SuppressWarnings({"unused"})
     PrayersProvider(PrayersWidgetService stocksWidgetService, Intent intent) {
         mContext = stocksWidgetService;
         mArabic = mContext.getResources().getBoolean(R.bool.arabic);
@@ -77,6 +78,7 @@ class PrayersProvider implements RemoteViewsService.RemoteViewsFactory {
         calendar.set(Calendar.SECOND, 0);
         final long midnightTimestamp = calendar.getTimeInMillis();
         final long nextMidnightTimestamp = midnightTimestamp + 24 * 60 * 60 * 1000;
+        mPrayerList = allPrayers;
         if (!allPrayers.isEmpty()) {
             mPrayerList = Lists.newArrayList(Iterables.filter(mPrayerList, new Predicate<Prayer>() {
                 @Override
