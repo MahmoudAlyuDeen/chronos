@@ -117,6 +117,7 @@ public class HomeActivity
         timeFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         ButterKnife.bind(this);
         setSupportActionBar(mHomeToolbar);
+        setTitle("");
     }
 
     @Override
