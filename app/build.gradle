@@ -71,4 +71,6 @@ dependencies {
     compile 'com.afollestad.material-dialogs:core:0.9.4.5'
 
     compile 'com.elyeproj.libraries:loaderviewlibrary:1.3.0'
+
+    compile 'com.evernote:android-job:1.1.11'
 }

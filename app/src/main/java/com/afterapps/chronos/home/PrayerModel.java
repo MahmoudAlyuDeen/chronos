@@ -21,8 +21,9 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-class PrayerModel {
+public class PrayerModel {
 
+    //used to only count/return timings when the 2 calls return or fail
     private boolean isFetching;
 
     interface PrayerCallback {
@@ -41,7 +42,7 @@ class PrayerModel {
         mPrayerCallback = prayerCallback;
     }
 
-    void getPrayers(int method, int school, int latitudeMethod) {
+    void getPrayers(final int method, final int school, final int latitudeMethod) {
         final Realm realm = Realm.getDefaultInstance();
         final Location location = realm.where(Location.class)
                 .equalTo("selected", true)
@@ -55,7 +56,7 @@ class PrayerModel {
         realm.close();
         final String timeZoneId = locationDetached.getTimezoneId();
         final String signature = timeZoneId + method + school + latitudeMethod;
-        List<Prayer> prayersDetached = getPrayers(signature);
+        List<Prayer> prayersDetached = getStoredPrayers(signature);
         if (prayersDetached.size() < 6) {
             isFetching = true;
             fetchPrayers(method, school, latitudeMethod, locationDetached, true);
@@ -65,7 +66,7 @@ class PrayerModel {
         }
     }
 
-    private List<Prayer> getPrayers(String signature) {
+    public static List<Prayer> getStoredPrayers(String signature) {
         final Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR_OF_DAY, 0);
         calendar.set(Calendar.MINUTE, 0);
@@ -85,20 +86,7 @@ class PrayerModel {
                               final int latitudeMethod,
                               final Location locationDetached,
                               final boolean prefetch) {
-        final Calendar currentTimeCal = Calendar.getInstance();
-        final int currentMonth = currentTimeCal.get(Calendar.MONTH) + 1;
-        final int currentYear = currentTimeCal.get(Calendar.YEAR);
-        final TimingsService timingsService = ServiceGenerator.createTimingsService();
-        Call<TimingsResponse> timingsCall = timingsService.getTimings(
-                locationDetached.getLatitude(),
-                locationDetached.getLongitude(),
-                locationDetached.getTimezoneId(),
-                prefetch ? currentMonth == 11 ? currentMonth : currentMonth + 1 : currentMonth,
-                prefetch && currentMonth == 11 ? currentYear + 1 : currentYear,
-                method,
-                school,
-                latitudeMethod
-        );
+        Call<TimingsResponse> timingsCall = getTimingsCall(method, school, latitudeMethod, locationDetached, Calendar.getInstance(), prefetch);
         timingsCall.enqueue(new Callback<TimingsResponse>() {
             @Override
             public void onResponse(@NonNull Call<TimingsResponse> call, @NonNull Response<TimingsResponse> response) {
@@ -116,6 +104,27 @@ class PrayerModel {
         });
     }
 
+    public static Call<TimingsResponse> getTimingsCall(final int method,
+                                                       final int school,
+                                                       final int latitudeMethod,
+                                                       final Location locationDetached,
+                                                       final Calendar currentTimeCal,
+                                                       final boolean prefetch) {
+        final int currentMonth = currentTimeCal.get(Calendar.MONTH) + 1;
+        final int currentYear = currentTimeCal.get(Calendar.YEAR);
+        final TimingsService timingsService = ServiceGenerator.createTimingsService();
+        return timingsService.getTimings(
+                locationDetached.getLatitude(),
+                locationDetached.getLongitude(),
+                locationDetached.getTimezoneId(),
+                prefetch ? currentMonth == 11 ? currentMonth : currentMonth + 1 : currentMonth,
+                prefetch && currentMonth == 11 ? currentYear + 1 : currentYear,
+                method,
+                school,
+                latitudeMethod
+        );
+    }
+
     private void storePrayers(final TimingsResponse timingsResponse,
                               final int method,
                               final int school,
@@ -126,14 +135,15 @@ class PrayerModel {
                     school,
                     latitudeMethod,
                     locationDetached);
-            Realm realm = Realm.getDefaultInstance();
+            final Realm realm = Realm.getDefaultInstance();
             realm.executeTransaction(new Realm.Transaction() {
                 @Override
                 public void execute(Realm realm) {
                     realm.copyToRealmOrUpdate(prayers);
-                    String timeZoneId = locationDetached.getTimezoneId();
-                    String signature = timeZoneId + method + school + latitudeMethod;
-                    List<Prayer> prayersDetached = getPrayers(signature);
+                    realm.close();
+                    final String timeZoneId = locationDetached.getTimezoneId();
+                    final String signature = timeZoneId + method + school + latitudeMethod;
+                    final List<Prayer> prayersDetached = getStoredPrayers(signature);
 
                     if (isFetching) {
                         isFetching = false;
@@ -152,7 +162,7 @@ class PrayerModel {
     }
 
     @SuppressWarnings("ConstantConditions")
-    private boolean isResponseValid(Response<TimingsResponse> response) {
+    public static boolean isResponseValid(Response<TimingsResponse> response) {
         return response.isSuccessful() &&
                 response.body() != null &&
                 response.body().getStatus().equals("OK") &&

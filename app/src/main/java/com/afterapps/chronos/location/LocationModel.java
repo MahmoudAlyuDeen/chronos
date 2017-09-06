@@ -4,6 +4,8 @@ package com.afterapps.chronos.location;
  * Created by mahmoudalyudeen on 7/24/17.
  */
 
+import android.support.annotation.NonNull;
+
 import com.afterapps.chronos.api.Responses.ReverseGeoLocResponse;
 import com.afterapps.chronos.api.ReverseGeoLocService;
 import com.afterapps.chronos.api.ServiceGenerator;
@@ -54,7 +56,8 @@ class LocationModel {
         mReverseGeoLocCall.enqueue(new Callback<ReverseGeoLocResponse>() {
             @SuppressWarnings("ConstantConditions")
             @Override
-            public void onResponse(Call<ReverseGeoLocResponse> call, Response<ReverseGeoLocResponse> response) {
+            public void onResponse(@NonNull Call<ReverseGeoLocResponse> call,
+                                   @NonNull Response<ReverseGeoLocResponse> response) {
                 if (isResponseValid(response)) {
                     unSelectOldLocations();
                     createLocation(geoLocation, response.body());
@@ -66,14 +69,15 @@ class LocationModel {
             }
 
             @Override
-            public void onFailure(Call<ReverseGeoLocResponse> call, Throwable t) {
+            public void onFailure(@NonNull Call<ReverseGeoLocResponse> call,
+                                  @NonNull Throwable t) {
                 mLocationCallBack.onLocationError();
             }
         });
     }
 
     private void selectLocation(final String timeZoneId) {
-        Realm realm = Realm.getDefaultInstance();
+        final Realm realm = Realm.getDefaultInstance();
         realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
@@ -89,14 +93,14 @@ class LocationModel {
 
     private void createLocation(final android.location.Location geoLocation,
                                 final ReverseGeoLocResponse reverseGeoLocResponse) {
-        Realm realm = Realm.getDefaultInstance();
+        final Realm realm = Realm.getDefaultInstance();
         realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
                 final Location location = realm.where(Location.class)
                         .equalTo("timezoneId", reverseGeoLocResponse.getTimeZoneId()).findFirst();
                 if (location == null) {
-                    Location newLocation = new Location(geoLocation, reverseGeoLocResponse);
+                    final Location newLocation = new Location(geoLocation, reverseGeoLocResponse);
                     realm.copyToRealmOrUpdate(newLocation);
                 }
                 realm.close();
@@ -105,7 +109,7 @@ class LocationModel {
     }
 
     private void unSelectOldLocations() {
-        Realm realm = Realm.getDefaultInstance();
+        final Realm realm = Realm.getDefaultInstance();
         realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {

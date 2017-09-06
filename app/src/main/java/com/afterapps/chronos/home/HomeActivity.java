@@ -28,7 +28,9 @@ import com.afterapps.chronos.BaseActivity;
 import com.afterapps.chronos.Constants;
 import com.afterapps.chronos.R;
 import com.afterapps.chronos.beans.Prayer;
+import com.afterapps.chronos.job.PrayersJob;
 import com.afterapps.chronos.location.LocationActivity;
+import com.afterapps.chronos.preferences.SettingsActivity;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -226,7 +228,8 @@ public class HomeActivity
     }
 
     private void filterPrayers() {
-        final long currentTimestamp = new Date().getTime();
+        final Calendar calendar = Calendar.getInstance();
+        final long currentTimestamp = calendar.getTimeInMillis();
         final List<Prayer> allUpcomingPrayers =
                 Lists.newArrayList(Iterables.filter(mPrayerList, new Predicate<Prayer>() {
                     @Override
@@ -238,7 +241,6 @@ public class HomeActivity
             showError();
             return;
         }
-        final Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR_OF_DAY, 0);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
@@ -335,6 +337,10 @@ public class HomeActivity
                 final Intent location = new Intent(this, LocationActivity.class);
                 startActivity(location);
                 return true;
+            case R.id.action_settings:
+                final Intent settings = new Intent(this, SettingsActivity.class);
+                startActivity(settings);
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -353,7 +359,7 @@ public class HomeActivity
                 startActivity(location);
                 break;
             case R.id.home_connection_error_notify_button:
-                //todo: schedule fetching and notification
+                PrayersJob.schedulePrayersJob();
                 mConnectionErrorNotifyConfirmed = true;
                 displayViewState();
                 break;

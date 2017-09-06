@@ -17,7 +17,7 @@ import com.mikepenz.aboutlibraries.LibsBuilder;
  * Created by Mahmoud on 10/6/2016.
  */
 
-public class ActivityPreferences extends AppCompatActivity {
+public class SettingsActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,17 +25,17 @@ public class ActivityPreferences extends AppCompatActivity {
         setupToolbar();
 
         getFragmentManager().beginTransaction()
-                .replace(android.R.id.content, new FragmentPreferences()).commit();
+                .replace(android.R.id.content, new SettingsFragment()).commit();
     }
 
     private void setupToolbar() {
         ViewGroup rootView = (ViewGroup) findViewById(R.id.action_bar_root);
 
         if (rootView != null) {
-            View view = getLayoutInflater().inflate(R.layout.preferences_toolbar, rootView, false);
+            View view = getLayoutInflater().inflate(R.layout.settings_toolbar, rootView, false);
             rootView.addView(view, 0);
 
-            Toolbar toolbar = (Toolbar) findViewById(R.id.preferences_toolbar);
+            Toolbar toolbar = (Toolbar) findViewById(R.id.settings_toolbar);
             setSupportActionBar(toolbar);
             setTitle(R.string.action_settings);
         }
@@ -44,12 +44,12 @@ public class ActivityPreferences extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
-    public static class FragmentPreferences extends PreferenceFragment {
+    public static class SettingsFragment extends PreferenceFragment {
 
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
-            addPreferencesFromResource(R.xml.preferences);
+            addPreferencesFromResource(R.xml.settings);
             setupAcknowledgementButtons();
         }
 
