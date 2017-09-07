@@ -42,7 +42,7 @@ public class PrayerModel {
         mPrayerCallback = prayerCallback;
     }
 
-    void getPrayers(final int method, final int school, final int latitudeMethod) {
+    void getPrayers(final String method, final String school, final String latitudeMethod) {
         final Realm realm = Realm.getDefaultInstance();
         final Location location = realm.where(Location.class)
                 .equalTo("selected", true)
@@ -81,9 +81,9 @@ public class PrayerModel {
         return prayersDetached;
     }
 
-    private void fetchPrayers(final int method,
-                              final int school,
-                              final int latitudeMethod,
+    private void fetchPrayers(final String method,
+                              final String school,
+                              final String latitudeMethod,
                               final Location locationDetached,
                               final boolean prefetch) {
         Call<TimingsResponse> timingsCall = getTimingsCall(method, school, latitudeMethod, locationDetached, Calendar.getInstance(), prefetch);
@@ -104,9 +104,9 @@ public class PrayerModel {
         });
     }
 
-    public static Call<TimingsResponse> getTimingsCall(final int method,
-                                                       final int school,
-                                                       final int latitudeMethod,
+    public static Call<TimingsResponse> getTimingsCall(final String method,
+                                                       final String school,
+                                                       final String latitudeMethod,
                                                        final Location locationDetached,
                                                        final Calendar currentTimeCal,
                                                        final boolean prefetch) {
@@ -126,9 +126,9 @@ public class PrayerModel {
     }
 
     private void storePrayers(final TimingsResponse timingsResponse,
-                              final int method,
-                              final int school,
-                              final int latitudeMethod,
+                              final String method,
+                              final String school,
+                              final String latitudeMethod,
                               final Location locationDetached) {
         try {
             final List<Prayer> prayers = timingsResponse.getPrayers(method,
@@ -140,7 +140,6 @@ public class PrayerModel {
                 @Override
                 public void execute(Realm realm) {
                     realm.copyToRealmOrUpdate(prayers);
-                    realm.close();
                     final String timeZoneId = locationDetached.getTimezoneId();
                     final String signature = timeZoneId + method + school + latitudeMethod;
                     final List<Prayer> prayersDetached = getStoredPrayers(signature);
@@ -156,6 +155,7 @@ public class PrayerModel {
                     }
                 }
             });
+            realm.close();
         } catch (IllegalAccessException e) {
             mPrayerCallback.onLogicError();
         }

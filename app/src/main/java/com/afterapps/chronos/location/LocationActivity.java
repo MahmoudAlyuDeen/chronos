@@ -17,6 +17,7 @@ import com.afollestad.materialdialogs.StackingBehavior;
 import com.afterapps.chronos.BaseLocationActivity;
 import com.afterapps.chronos.Constants;
 import com.afterapps.chronos.R;
+import com.afterapps.chronos.Utilities;
 import com.afterapps.chronos.beans.Location;
 import com.google.android.gms.location.places.AutocompleteFilter;
 import com.google.android.gms.location.places.Place;
@@ -172,6 +173,7 @@ public class LocationActivity
 
     @Override
     public void onLocationHandled() {
+        Utilities.updateHomeScreenWidget(this);
         finish();
     }
 

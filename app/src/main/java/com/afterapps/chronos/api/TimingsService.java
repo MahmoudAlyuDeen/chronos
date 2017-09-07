@@ -21,8 +21,8 @@ public interface TimingsService {
             @Query("timezonestring") String timezoneId,
             @Query("month") int month,
             @Query("year") int year,
-            @Query("method") int method,
-            @Query("school") int school,
-            @Query("latitudeAdjustmentMethod") int latitudeMethod
+            @Query("method") String method,
+            @Query("school") String school,
+            @Query("latitudeAdjustmentMethod") String latitudeMethod
     );
 }

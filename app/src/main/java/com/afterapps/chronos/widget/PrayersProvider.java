@@ -4,21 +4,19 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
 import com.afterapps.chronos.Constants;
 import com.afterapps.chronos.R;
+import com.afterapps.chronos.Utilities;
 import com.afterapps.chronos.beans.Location;
 import com.afterapps.chronos.beans.Prayer;
+import com.afterapps.chronos.job.PrayersJob;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.iconics.IconicsDrawable;
-import com.mikepenz.weather_icons_typeface_library.WeatherIcons;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -57,9 +55,12 @@ class PrayersProvider implements RemoteViewsService.RemoteViewsFactory {
         mPrayerList = new ArrayList<>(0);
         final Realm realm = Realm.getDefaultInstance();
         final SharedPreferences mPref = PreferenceManager.getDefaultSharedPreferences(mContext);
-        final int method = mPref.getInt(mContext.getString(R.string.preference_key_method), 5);
-        final int school = mPref.getInt(mContext.getString(R.string.preference_key_school), 0);
-        final int latitudeMethod = mPref.getInt(mContext.getString(R.string.preference_key_latitude), 3);
+        final String method = mPref.getString(mContext.getString(R.string.preference_key_method),
+                mContext.getString(R.string.preference_default_method));
+        final String school = mPref.getString(mContext.getString(R.string.preference_key_school),
+                mContext.getString(R.string.preference_default_school));
+        final String latitudeMethod = mPref.getString(mContext.getString(R.string.preference_key_latitude),
+                mContext.getString(R.string.preference_default_latitude));
         final Location location = realm.where(Location.class)
                 .equalTo("selected", true)
                 .findFirst();
@@ -87,6 +88,9 @@ class PrayersProvider implements RemoteViewsService.RemoteViewsFactory {
                             prayer.getTimestamp() < nextMidnightTimestamp;
                 }
             }));
+        }
+        if (mPrayerList.size() < 6) {
+            PrayersJob.schedulePrayersJob();
         }
     }
 
@@ -141,39 +145,11 @@ class PrayersProvider implements RemoteViewsService.RemoteViewsFactory {
         final String prayerTitle = prayerNames.get(prayer.getWhichPrayer())[mArabic ? 2 : 0];
         final String prayerSubtitle = prayerNames.get(prayer.getWhichPrayer())[mArabic ? 3 : 1];
         final String formattedTimestamp = timeFormat.format(prayer.getTimestamp());
-        final IconicsDrawable prayerIcon = getPrayerIcon(prayer);
+        final IconicsDrawable prayerIcon = Utilities.getPrayerIcon(prayer, mContext);
 
         itemRemoteView.setTextViewText(R.id.item_prayer_title_text_view, prayerTitle);
         itemRemoteView.setTextViewText(R.id.item_prayer_subtitle_text_view, prayerSubtitle);
         itemRemoteView.setTextViewText(R.id.item_prayer_timing_text_view, formattedTimestamp);
         itemRemoteView.setImageViewBitmap(R.id.item_prayer_logo_image_view, prayerIcon.toBitmap());
-    }
-
-    @NonNull
-    private IconicsDrawable getPrayerIcon(Prayer prayer) {
-        final IconicsDrawable prayerIcon =
-                new IconicsDrawable(mContext)
-                        .color(ContextCompat.getColor(mContext, R.color.colorTextSecondary));
-        switch (prayer.getWhichPrayer()) {
-            case "fajr":
-                prayerIcon.icon(WeatherIcons.Icon.wic_stars);
-                break;
-            case "sunrise":
-                prayerIcon.icon(WeatherIcons.Icon.wic_sunrise);
-                break;
-            case "dhuhr":
-                prayerIcon.icon(WeatherIcons.Icon.wic_day_sunny);
-                break;
-            case "asr":
-                prayerIcon.icon(WeatherIcons.Icon.wic_day_cloudy_high);
-                break;
-            case "maghrib":
-                prayerIcon.icon(WeatherIcons.Icon.wic_sunset);
-                break;
-            case "isha":
-                prayerIcon.icon(FontAwesome.Icon.faw_moon_o);
-                break;
-        }
-        return prayerIcon;
     }
 }

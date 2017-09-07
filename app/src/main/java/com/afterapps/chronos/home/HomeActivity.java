@@ -3,12 +3,10 @@ package com.afterapps.chronos.home;
 import android.animation.Animator;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -27,6 +25,7 @@ import android.widget.TextView;
 import com.afterapps.chronos.BaseActivity;
 import com.afterapps.chronos.Constants;
 import com.afterapps.chronos.R;
+import com.afterapps.chronos.Utilities;
 import com.afterapps.chronos.beans.Prayer;
 import com.afterapps.chronos.job.PrayersJob;
 import com.afterapps.chronos.location.LocationActivity;
@@ -34,9 +33,11 @@ import com.afterapps.chronos.preferences.SettingsActivity;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.iconics.IconicsDrawable;
-import com.mikepenz.weather_icons_typeface_library.WeatherIcons;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -129,6 +130,7 @@ public class HomeActivity
             mPref.registerOnSharedPreferenceChangeListener(this);
             onSharedPreferenceChanged(mPref, "");
         }
+        EventBus.getDefault().register(this);
     }
 
     @Override
@@ -143,6 +145,13 @@ public class HomeActivity
             mPref.unregisterOnSharedPreferenceChangeListener(this);
         }
         mHomeAppBarLogoImageView.setAlpha(0f);
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(PrayersJob.PrayersFetchedEvent event) {
+        //todo: hide notification
+        onSharedPreferenceChanged(mPref, "");
     }
 
     @NonNull
@@ -154,9 +163,12 @@ public class HomeActivity
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (mPref == null) return;
-        final int method = mPref.getInt(getString(R.string.preference_key_method), 5);
-        final int school = mPref.getInt(getString(R.string.preference_key_school), 0);
-        final int latitudeMethod = mPref.getInt(getString(R.string.preference_key_latitude), 3);
+        final String method = mPref.getString(getString(R.string.preference_key_method),
+                getString(R.string.preference_default_method));
+        final String school = mPref.getString(getString(R.string.preference_key_school),
+                getString(R.string.preference_default_school));
+        final String latitudeMethod = mPref.getString(getString(R.string.preference_key_latitude),
+                getString(R.string.preference_default_latitude));
         presenter.getPrayers(method, school, latitudeMethod);
     }
 
@@ -202,7 +214,7 @@ public class HomeActivity
     @Override
     public void onPrayersReady(List<Prayer> prayersDetached) {
         mPrayerList = prayersDetached;
-        updateHomeScreenWidget();
+        Utilities.updateHomeScreenWidget(this);
         startTicking();
     }
 
@@ -237,8 +249,8 @@ public class HomeActivity
                         return prayer.getTimestamp() > currentTimestamp;
                     }
                 }));
-        if (allUpcomingPrayers.isEmpty()) {
-            showError();
+        if (allUpcomingPrayers.size() < 6) {
+            onSharedPreferenceChanged(mPref, "");
             return;
         }
         calendar.set(Calendar.HOUR_OF_DAY, 0);
@@ -260,7 +272,7 @@ public class HomeActivity
     }
 
     private void displayUpcomingLogo(final boolean firstTime, final long midnightTimestamp) {
-        IconicsDrawable upcomingLogo = getDayTimeLogo(midnightTimestamp);
+        IconicsDrawable upcomingLogo = Utilities.getDayTimeLogo(mPrayerList, midnightTimestamp, this);
         if (upcomingLogo == null) {
             return;
         }
@@ -372,36 +384,6 @@ public class HomeActivity
             case R.id.home_logic_error_restart_button:
                 //todo
                 break;
-        }
-    }
-
-    @Nullable
-    private IconicsDrawable getDayTimeLogo(final long midnightTimestamp) {
-        final long currentTimestamp = new Date().getTime();
-        final long nextMidnightTimestamp = midnightTimestamp + 24 * 60 * 60 * 1000;
-        final List<Prayer> todayPrayers =
-                Lists.newArrayList(Iterables.filter(mPrayerList, new Predicate<Prayer>() {
-                    @Override
-                    public boolean apply(Prayer prayer) {
-                        return prayer.getTimestamp() > midnightTimestamp &&
-                                prayer.getTimestamp() < nextMidnightTimestamp;
-                    }
-                }));
-        if (todayPrayers.size() < 6) {
-            return null;
-        } else {
-            final long sunriseTimestamp = todayPrayers.get(1).getTimestamp();
-            final long sunsetTimestamp = todayPrayers.get(4).getTimestamp();
-
-            final IconicsDrawable dayTimeLogo = new IconicsDrawable(this).color(Color.WHITE);
-            if (currentTimestamp < sunriseTimestamp) {
-                dayTimeLogo.icon(WeatherIcons.Icon.wic_stars);
-            } else if (currentTimestamp > sunsetTimestamp) {
-                dayTimeLogo.icon(FontAwesome.Icon.faw_moon_o);
-            } else {
-                dayTimeLogo.icon(WeatherIcons.Icon.wic_day_sunny);
-            }
-            return dayTimeLogo;
         }
     }
 

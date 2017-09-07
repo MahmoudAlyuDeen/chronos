@@ -1,6 +1,8 @@
 package com.afterapps.chronos.home;
 
 import com.afterapps.chronos.beans.Prayer;
+import com.afterapps.chronos.job.PrayersJob;
+import com.evernote.android.job.JobManager;
 import com.hannesdorfmann.mosby3.mvp.MvpBasePresenter;
 
 import java.util.List;
@@ -14,7 +16,7 @@ class HomePresenter extends MvpBasePresenter<HomeView>
 
     private PrayerModel mPrayerModel;
 
-    void getPrayers(int method, int school, int latitudeMethod) {
+    void getPrayers(String method, String school, String latitudeMethod) {
         if (mPrayerModel == null) {
             mPrayerModel = new PrayerModel(this);
         }
@@ -26,6 +28,7 @@ class HomePresenter extends MvpBasePresenter<HomeView>
 
     @Override
     public void onPrayersReady(List<Prayer> prayersDetached) {
+        JobManager.instance().cancelAllForTag(PrayersJob.TAG);
         if (isViewAttached() && getView() != null) {
             getView().onPrayersReady(prayersDetached);
             getView().showContent();

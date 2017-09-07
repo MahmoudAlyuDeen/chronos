@@ -36,7 +36,7 @@ public class TimingsResponse {
         return days;
     }
 
-    public List<Prayer> getPrayers(int method, int school, int latitudeMethod, Location locationDetached)
+    public List<Prayer> getPrayers(String method, String school, String latitudeMethod, Location locationDetached)
             throws IllegalAccessException {
         List<Prayer> prayerList = new ArrayList<>(0);
         for (Day day : days) {
@@ -131,9 +131,9 @@ public class TimingsResponse {
             }
 
             List<Prayer> getTimestampedPrayers(long dayTimestamp,
-                                               int method,
-                                               int school,
-                                               int latitudeMethod,
+                                               String method,
+                                               String school,
+                                               String latitudeMethod,
                                                Location locationDetached)
                     throws IllegalAccessException {
                 List<Prayer> prayerList = new ArrayList<>(0);

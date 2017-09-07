@@ -2,7 +2,6 @@ package com.afterapps.chronos.home;
 
 import android.content.Context;
 import android.graphics.Typeface;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
@@ -15,10 +14,9 @@ import android.widget.TextView;
 
 import com.afterapps.chronos.Constants;
 import com.afterapps.chronos.R;
+import com.afterapps.chronos.Utilities;
 import com.afterapps.chronos.beans.Prayer;
-import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.iconics.IconicsDrawable;
-import com.mikepenz.weather_icons_typeface_library.WeatherIcons;
 
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
@@ -105,7 +103,7 @@ class PrayersAdapter extends RecyclerView.Adapter<PrayersAdapter.PrayerViewHolde
             final String prayerTitle = prayerNames.get(prayer.getWhichPrayer())[mArabic ? 2 : 0];
             final String prayerSubtitle = prayerNames.get(prayer.getWhichPrayer())[mArabic ? 3 : 1];
             final String daySubHeaderString = getDayString(prayer);
-            final IconicsDrawable prayerIcon = getPrayerIcon(prayer);
+            final IconicsDrawable prayerIcon = Utilities.getPrayerIcon(prayer, mContext);
             final int textColor = getTextColor();
             final int textStyle = getTextStyle();
             mItemPrayerTitleTextView.setText(prayerTitle);
@@ -136,34 +134,6 @@ class PrayersAdapter extends RecyclerView.Adapter<PrayersAdapter.PrayerViewHolde
         private int getTextStyle() {
             return getAdapterPosition() == 0 ?
                     Typeface.BOLD : Typeface.NORMAL;
-        }
-
-        @NonNull
-        private IconicsDrawable getPrayerIcon(Prayer prayer) {
-            final IconicsDrawable prayerIcon = new IconicsDrawable(mContext);
-            switch (prayer.getWhichPrayer()) {
-                case "fajr":
-                    prayerIcon.icon(WeatherIcons.Icon.wic_stars);
-                    break;
-                case "sunrise":
-                    prayerIcon.icon(WeatherIcons.Icon.wic_sunrise);
-                    break;
-                case "dhuhr":
-                    prayerIcon.icon(WeatherIcons.Icon.wic_day_sunny);
-                    break;
-                case "asr":
-                    prayerIcon.icon(WeatherIcons.Icon.wic_day_cloudy_high);
-                    break;
-                case "maghrib":
-                    prayerIcon.icon(WeatherIcons.Icon.wic_sunset);
-                    break;
-                case "isha":
-                    prayerIcon.icon(FontAwesome.Icon.faw_moon_o);
-                    break;
-            }
-            prayerIcon.color(ContextCompat.getColor(mContext, getAdapterPosition() == 0 ?
-                    R.color.colorAccent : R.color.colorTextSecondary));
-            return prayerIcon;
         }
     }
 }

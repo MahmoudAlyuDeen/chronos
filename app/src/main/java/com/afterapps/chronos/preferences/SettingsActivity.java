@@ -1,5 +1,6 @@
 package com.afterapps.chronos.preferences;
 
+import android.appwidget.AppWidgetManager;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.afterapps.chronos.R;
+import com.afterapps.chronos.widget.PrayersWidget;
 import com.mikepenz.aboutlibraries.LibsBuilder;
 
 /*
@@ -23,9 +25,22 @@ public class SettingsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setupToolbar();
+        setTheme(R.style.SettingsTheme);
 
         getFragmentManager().beginTransaction()
                 .replace(android.R.id.content, new SettingsFragment()).commit();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        updateHomeScreenWidget();
+    }
+
+    protected void updateHomeScreenWidget() {
+        Intent invalidateWidget = new Intent(this, PrayersWidget.class);
+        invalidateWidget.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+        sendBroadcast(invalidateWidget);
     }
 
     private void setupToolbar() {
@@ -39,9 +54,12 @@ public class SettingsActivity extends AppCompatActivity {
             setSupportActionBar(toolbar);
             setTitle(R.string.action_settings);
         }
+    }
 
-        if (getSupportActionBar() != null)
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish();
+        return true;
     }
 
     public static class SettingsFragment extends PreferenceFragment {

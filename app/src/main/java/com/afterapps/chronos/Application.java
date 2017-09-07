@@ -5,6 +5,8 @@ package com.afterapps.chronos;
  */
 
 
+import android.preference.PreferenceManager;
+
 import com.afterapps.chronos.job.TimingsJobCreator;
 import com.evernote.android.job.JobManager;
 
@@ -21,6 +23,8 @@ public class Application extends android.app.Application {
         Realm.setDefaultConfiguration(config);
 
         JobManager.create(this).addJobCreator(new TimingsJobCreator());
+
+        PreferenceManager.setDefaultValues(this, R.xml.settings, false);
 
         //todo: enable un-comment out this before release
 //        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {

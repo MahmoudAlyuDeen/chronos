@@ -1,11 +1,8 @@
 package com.afterapps.chronos;
 
-import android.appwidget.AppWidgetManager;
-import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
 
-import com.afterapps.chronos.widget.PrayersWidget;
 import com.hannesdorfmann.mosby3.mvp.MvpActivity;
 import com.hannesdorfmann.mosby3.mvp.MvpPresenter;
 import com.hannesdorfmann.mosby3.mvp.MvpView;
@@ -106,11 +103,5 @@ public abstract class BaseActivity<V extends MvpView, P extends MvpPresenter<V>>
 
     public void showConnectionError() {
         Toast.makeText(this, R.string.error_connection_title, Toast.LENGTH_SHORT).show();
-    }
-
-    protected void updateHomeScreenWidget() {
-        Intent invalidateWidget = new Intent(this, PrayersWidget.class);
-        invalidateWidget.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-        sendBroadcast(invalidateWidget);
     }
 }

@@ -7,15 +7,17 @@ package com.afterapps.chronos.job;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.afterapps.chronos.R;
+import com.afterapps.chronos.Utilities;
 import com.afterapps.chronos.api.Responses.TimingsResponse;
 import com.afterapps.chronos.beans.Location;
 import com.afterapps.chronos.beans.Prayer;
 import com.afterapps.chronos.home.PrayerModel;
 import com.evernote.android.job.Job;
 import com.evernote.android.job.JobRequest;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.Calendar;
 import java.util.List;
@@ -28,7 +30,7 @@ import static com.afterapps.chronos.home.PrayerModel.isResponseValid;
 
 public class PrayersJob extends Job {
 
-    static final String TAG = "prayersJobTag";
+    public static final String TAG = "prayersJobTag";
 
     public static int schedulePrayersJob() {
         return new JobRequest.Builder(TAG)
@@ -47,9 +49,12 @@ public class PrayersJob extends Job {
     protected Result onRunJob(Params params) {
         final Realm realm = Realm.getDefaultInstance();
         final SharedPreferences mPref = PreferenceManager.getDefaultSharedPreferences(getContext());
-        final int method = mPref.getInt(getContext().getString(R.string.preference_key_method), 5);
-        final int school = mPref.getInt(getContext().getString(R.string.preference_key_school), 0);
-        final int latitudeMethod = mPref.getInt(getContext().getString(R.string.preference_key_latitude), 3);
+        final String method = mPref.getString(getContext().getString(R.string.preference_key_method),
+                getContext().getString(R.string.preference_default_method));
+        final String school = mPref.getString(getContext().getString(R.string.preference_key_school),
+                getContext().getString(R.string.preference_default_school));
+        final String latitudeMethod = mPref.getString(getContext().getString(R.string.preference_key_latitude),
+                getContext().getString(R.string.preference_default_latitude));
         final Location location = realm.where(Location.class)
                 .equalTo("selected", true)
                 .findFirst();
@@ -70,17 +75,18 @@ public class PrayersJob extends Job {
     }
 
     private void handleSuccess() {
-        Log.d(TAG, "handleSuccess: ");
-        //todo
+        Utilities.updateHomeScreenWidget(getContext());
+        //todo: show notification
+        EventBus.getDefault().post(new PrayersFetchedEvent());
     }
 
     private boolean loadPrayers(String signature) {
         return PrayerModel.getStoredPrayers(signature).size() >= 6;
     }
 
-    private boolean fetchPrayers(final int method,
-                                 final int school,
-                                 final int latitudeMethod,
+    private boolean fetchPrayers(final String method,
+                                 final String school,
+                                 final String latitudeMethod,
                                  final Location locationDetached) {
         Call<TimingsResponse> currentMonthTimingsCall = PrayerModel.getTimingsCall(method,
                 school,
@@ -112,9 +118,9 @@ public class PrayersJob extends Job {
     private boolean storePrayers(
             final TimingsResponse currentMonthResponse,
             final TimingsResponse nextMonthResponse,
-            final int method,
-            final int school,
-            final int latitudeMethod,
+            final String method,
+            final String school,
+            final String latitudeMethod,
             final Location locationDetached) throws IllegalAccessException {
         final List<Prayer> currentMonthPrayers = currentMonthResponse.getPrayers(method,
                 school,
@@ -135,5 +141,8 @@ public class PrayersJob extends Job {
         });
         realm.close();
         return true;
+    }
+
+    public class PrayersFetchedEvent {
     }
 }

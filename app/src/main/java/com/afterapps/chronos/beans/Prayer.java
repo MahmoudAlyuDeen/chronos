@@ -19,9 +19,9 @@ public class Prayer extends RealmObject {
 
     public Prayer(String whichPrayer,
                   long timestamp,
-                  int method,
-                  int school,
-                  int latitudeMethod, Location locationDetached) {
+                  String method,
+                  String school,
+                  String latitudeMethod, Location locationDetached) {
         String timeZoneId = locationDetached.getTimezoneId();
         this.signature = timeZoneId + method + school + latitudeMethod;
         this.whichPrayer = whichPrayer;
