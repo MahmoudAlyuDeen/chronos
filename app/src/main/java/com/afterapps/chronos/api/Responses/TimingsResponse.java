@@ -40,7 +40,7 @@ public class TimingsResponse {
             throws IllegalAccessException {
         List<Prayer> prayerList = new ArrayList<>(0);
         for (Day day : days) {
-            List<Prayer> timestampedPrayers = day.getTimings().getTimestampedPrayers(day.getDate().getTimestamp(),
+            final List<Prayer> timestampedPrayers = day.getTimings().getTimestampedPrayers(day.getDate().getTimestamp(),
                     method,
                     school,
                     latitudeMethod,
@@ -130,33 +130,35 @@ public class TimingsResponse {
                 return isha;
             }
 
-            List<Prayer> getTimestampedPrayers(long dayTimestamp,
-                                               String method,
-                                               String school,
-                                               String latitudeMethod,
-                                               Location locationDetached)
+            List<Prayer> getTimestampedPrayers(final long dayTimestamp,
+                                               final String method,
+                                               final String school,
+                                               final String latitudeMethod,
+                                               final Location locationDetached)
                     throws IllegalAccessException {
-                List<Prayer> prayerList = new ArrayList<>(0);
-                Field[] fields = Timings.class.getDeclaredFields();
+                final List<Prayer> prayerList = new ArrayList<>(0);
+                final Field[] fields = Timings.class.getDeclaredFields();
                 for (Field field : fields) {
                     String timing = (String) field.get(this);
                     if (timing == null) continue;
-                    String whichPrayer = field.getName();
-                    Calendar calendar = Calendar.getInstance();
+                    final String whichPrayer = field.getName();
+                    final Calendar calendar = Calendar.getInstance();
+                    final long currentTimestamp = calendar.getTimeInMillis();
                     calendar.setTimeInMillis(dayTimestamp * 1000);
-                    int currentMonth = calendar.get(Calendar.MONTH);
-                    int currentYear = calendar.get(Calendar.YEAR);
-                    int currentDay = calendar.get(Calendar.DAY_OF_MONTH);
+                    final int currentMonth = calendar.get(Calendar.MONTH);
+                    final int currentYear = calendar.get(Calendar.YEAR);
+                    final int currentDay = calendar.get(Calendar.DAY_OF_MONTH);
                     calendar.set(currentYear, currentMonth, currentDay,
                             Integer.valueOf(timing.substring(0, 2)),
                             Integer.valueOf(timing.substring(3, 5)));
+                    final long timeInMillis = calendar.getTimeInMillis();
                     prayerList.add(
                             new Prayer(whichPrayer,
-                                    calendar.getTimeInMillis(),
+                                    timeInMillis,
                                     method,
                                     school,
                                     latitudeMethod,
-                                    locationDetached));
+                                    locationDetached.getTimezoneId()));
                 }
                 return prayerList;
             }

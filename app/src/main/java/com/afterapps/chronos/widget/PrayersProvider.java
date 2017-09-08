@@ -13,9 +13,6 @@ import com.afterapps.chronos.Utilities;
 import com.afterapps.chronos.beans.Location;
 import com.afterapps.chronos.beans.Prayer;
 import com.afterapps.chronos.job.PrayersJob;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import com.mikepenz.iconics.IconicsDrawable;
 
 import java.text.SimpleDateFormat;
@@ -28,13 +25,16 @@ import java.util.Locale;
 import io.realm.Realm;
 import io.realm.Sort;
 
+import static com.afterapps.chronos.Constants.DISPLAY_THRESHOLD;
+import static com.afterapps.chronos.Utilities.getPrayersForDay;
+
 /*
  * Created by mahmoudalyudeen on 4/25/17.
  */
 
 class PrayersProvider implements RemoteViewsService.RemoteViewsFactory {
 
-    private Context mContext;
+    private final Context mContext;
     private List<Prayer> mPrayerList;
     private final boolean mArabic;
     private final SimpleDateFormat timeFormat;
@@ -81,15 +81,9 @@ class PrayersProvider implements RemoteViewsService.RemoteViewsFactory {
         final long nextMidnightTimestamp = midnightTimestamp + 24 * 60 * 60 * 1000;
         mPrayerList = allPrayers;
         if (!allPrayers.isEmpty()) {
-            mPrayerList = Lists.newArrayList(Iterables.filter(mPrayerList, new Predicate<Prayer>() {
-                @Override
-                public boolean apply(Prayer prayer) {
-                    return prayer.getTimestamp() > midnightTimestamp &&
-                            prayer.getTimestamp() < nextMidnightTimestamp;
-                }
-            }));
+            mPrayerList = getPrayersForDay(mPrayerList, midnightTimestamp, nextMidnightTimestamp);
         }
-        if (mPrayerList.size() < 6) {
+        if (mPrayerList.size() < DISPLAY_THRESHOLD) {
             PrayersJob.schedulePrayersJob();
         }
     }

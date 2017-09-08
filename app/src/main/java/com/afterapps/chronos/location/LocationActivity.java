@@ -17,7 +17,6 @@ import com.afollestad.materialdialogs.StackingBehavior;
 import com.afterapps.chronos.BaseLocationActivity;
 import com.afterapps.chronos.Constants;
 import com.afterapps.chronos.R;
-import com.afterapps.chronos.Utilities;
 import com.afterapps.chronos.beans.Location;
 import com.google.android.gms.location.places.AutocompleteFilter;
 import com.google.android.gms.location.places.Place;
@@ -35,6 +34,8 @@ import butterknife.OnClick;
 import io.realm.OrderedRealmCollection;
 import io.realm.Realm;
 import pub.devrel.easypermissions.EasyPermissions;
+
+import static com.afterapps.chronos.Utilities.updateHomeScreenWidget;
 
 public class LocationActivity
         extends BaseLocationActivity<LocationView, LocationPresenter>
@@ -82,8 +83,8 @@ public class LocationActivity
     }
 
     private void displayLocations() {
-        OrderedRealmCollection<Location> locations = mRealm.where(Location.class).findAll();
-        LocationsAdapter adapter = new LocationsAdapter(locations, this);
+        final OrderedRealmCollection<Location> locations = mRealm.where(Location.class).findAll();
+        final LocationsAdapter adapter = new LocationsAdapter(locations);
         mLocationsRecycler.setAdapter(adapter);
     }
 
@@ -126,11 +127,11 @@ public class LocationActivity
 
     private void startAutoCompleteOverlay() {
         try {
-            AutocompleteFilter autocompleteFilter = new AutocompleteFilter.Builder()
+            final AutocompleteFilter autocompleteFilter = new AutocompleteFilter.Builder()
                     .setTypeFilter(AutocompleteFilter.TYPE_FILTER_CITIES)
                     .build();
 
-            Intent intent = new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_OVERLAY)
+            final Intent intent = new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_OVERLAY)
                     .setFilter(autocompleteFilter)
                     .build(LocationActivity.this);
 
@@ -152,8 +153,8 @@ public class LocationActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == RC_PLACES_AUTO_COMPLETE_OVERLAY && resultCode == RESULT_OK) {
-            Place place = PlaceAutocomplete.getPlace(this, data);
-            android.location.Location location = new android.location.Location(LocationManager.GPS_PROVIDER);
+            final Place place = PlaceAutocomplete.getPlace(this, data);
+            final android.location.Location location = new android.location.Location(LocationManager.GPS_PROVIDER);
             location.setLatitude(place.getLatLng().latitude);
             location.setLongitude(place.getLatLng().longitude);
             onLocationChanged(location);
@@ -173,7 +174,7 @@ public class LocationActivity
 
     @Override
     public void onLocationHandled() {
-        Utilities.updateHomeScreenWidget(this);
+        updateHomeScreenWidget(this);
         finish();
     }
 

@@ -7,6 +7,8 @@ import android.view.ViewGroup;
 
 import com.afterapps.chronos.R;
 
+import static com.afterapps.chronos.Constants.DISPLAY_THRESHOLD;
+
 /*
  * Created by mahmoudalyudeen on 5/9/17.
  */
@@ -36,7 +38,7 @@ class ProgressAdapter extends RecyclerView.Adapter<ProgressAdapter.ProgressViewH
 
     @Override
     public int getItemCount() {
-        return 6;
+        return DISPLAY_THRESHOLD;
     }
 
     class ProgressViewHolder extends RecyclerView.ViewHolder {

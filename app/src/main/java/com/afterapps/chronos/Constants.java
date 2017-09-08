@@ -9,12 +9,17 @@ import java.util.HashMap;
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class Constants {
 
+    private Constants() {
+    }
+
     public static final String PLAY_SERVICES_LINK = "https://play.google.com/store/apps/details?id=com.google.android.gms";
 
     public static final String FROM_ON_BOARDING = "locationOpenedFromEmptyState";
 
-    private Constants() {
-    }
+    public static final int FETCH_THRESHOLD = 12;
+    public static final int DISPLAY_THRESHOLD = 6;
+    public static final int PREFETCH_THRESHOLD = 60;
+    public static final String NOTIFICATION_TAG_PRAYERS_READY = "notificationTagPrayersReady";
 
     public static String GOOGLE_REVERSE_GEO_LOC_API_KEY = "AIzaSyCUSRQAQCa5CmKPWe_VWdlArClGjQTXAZE";
 

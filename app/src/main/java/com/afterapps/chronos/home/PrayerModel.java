@@ -21,10 +21,12 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.afterapps.chronos.Constants.FETCH_THRESHOLD;
+import static com.afterapps.chronos.Constants.PREFETCH_THRESHOLD;
+
 public class PrayerModel {
 
-    //used to only count/return timings when the 2 calls return or fail
-    private boolean isFetching;
+    private boolean shouldWaitForConcurrentResponse;
 
     interface PrayerCallback {
         void onLocationError();
@@ -52,16 +54,19 @@ public class PrayerModel {
             realm.close();
             return;
         }
-        Location locationDetached = realm.copyFromRealm(location);
+        final Location locationDetached = realm.copyFromRealm(location);
         realm.close();
         final String timeZoneId = locationDetached.getTimezoneId();
         final String signature = timeZoneId + method + school + latitudeMethod;
-        List<Prayer> prayersDetached = getStoredPrayers(signature);
-        if (prayersDetached.size() < 6) {
-            isFetching = true;
+        final List<Prayer> prayersDetached = getStoredPrayers(signature);
+        if (prayersDetached.size() < FETCH_THRESHOLD) {
+            shouldWaitForConcurrentResponse = true;
             fetchPrayers(method, school, latitudeMethod, locationDetached, true);
             fetchPrayers(method, school, latitudeMethod, locationDetached, false);
         } else {
+            if (prayersDetached.size() < PREFETCH_THRESHOLD) {
+                fetchPrayers(method, school, latitudeMethod, locationDetached, true);
+            }
             mPrayerCallback.onPrayersReady(prayersDetached);
         }
     }
@@ -72,8 +77,8 @@ public class PrayerModel {
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
         final long midnightTimestamp = calendar.getTimeInMillis();
-        Realm realm = Realm.getDefaultInstance();
-        List<Prayer> prayersDetached = realm.copyFromRealm(realm.where(Prayer.class)
+        final Realm realm = Realm.getDefaultInstance();
+        final List<Prayer> prayersDetached = realm.copyFromRealm(realm.where(Prayer.class)
                 .equalTo("signature", signature)
                 .greaterThan("timestamp", midnightTimestamp)
                 .findAllSorted("timestamp", Sort.ASCENDING));
@@ -144,8 +149,8 @@ public class PrayerModel {
                     final String signature = timeZoneId + method + school + latitudeMethod;
                     final List<Prayer> prayersDetached = getStoredPrayers(signature);
 
-                    if (isFetching) {
-                        isFetching = false;
+                    if (shouldWaitForConcurrentResponse) {
+                        shouldWaitForConcurrentResponse = false;
                     } else {
                         if (prayersDetached.size() == 0) {
                             mPrayerCallback.onLogicError();

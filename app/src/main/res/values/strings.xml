@@ -31,7 +31,7 @@
     <!--errors and warnings-->
     <string name="error_connection_title">Can\'t load prayers</string>
     <string name="error_connection_prompt">No internet connection. We can notify you when prayers are available.</string>
-    <string name="reverse_geo_error">Can\'t add location; system time is not set correctly</string>
+    <string name="error_reverse_geo">Can\'t add location; system time is not set correctly</string>
     <string name="error_play_services">Google Play Services must be installed</string>
 
     <!--preferences-->
@@ -59,22 +59,6 @@
     <string name="preference_key_api" translatable="false">preferenceKeyApi</string>
     <string name="preference_title_api">Al-Adhan API</string>
 
-    <!--prayer names arabic-->
-    <string name="dawn_ar">Fajr</string>
-    <string name="sunrise_ar">Shurouq</string>
-    <string name="noon_ar">Dhuhr</string>
-    <string name="afternoon_ar">Asr</string>
-    <string name="sunset_ar">Maghrib</string>
-    <string name="night_ar">Isha\'a</string>
-
-    <!--prayer names english-->
-    <string name="dawn_en" translatable="false">The dawn prayer</string>
-    <string name="sunrise_en" translatable="false">Sunrise</string>
-    <string name="noon_en" translatable="false">The noon prayer</string>
-    <string name="afternoon_en" translatable="false">The afternoon prayer</string>
-    <string name="sunset_en" translatable="false">The sunset prayer</string>
-    <string name="night_en" translatable="false">The night prayer</string>
-
     <!--locations screen-->
     <string name="title_location">Location</string>
     <string name="rationale_location">Location permission is needed to locate your city</string>
@@ -91,12 +75,14 @@
     <string name="action_location_manual">Search</string>
     <string name="up_next_mosque_anchor">000000</string>
     <string name="error_logic_title">Something went wrong</string>
-    <string name="error_logic_prompt">We\'re looking into the problem, please bare with us. Would you like to clear the database and try again?</string>
+    <string name="error_logic_prompt">We\'re looking into the problem, please bear with us. Meanwhile, would you like to clear the database and start over?</string>
     <string name="action_clear">Clear</string>
     <string name="action_restart">Restart</string>
     <string name="error_connection_notify_confirmation">You will be notified when prayers are available</string>
 
     <!--home screen widget-->
     <string name="empty_state_widget">Prayers not loaded yet. Tap to open the app</string>
+    <string name="notification_body_prayers_ready">You tried to view timings when you were offline.</string>
+    <string name="notification_title_prayers_ready">View prayer timings in Miqat</string>
 
 </resources>

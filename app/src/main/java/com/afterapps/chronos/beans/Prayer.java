@@ -6,10 +6,11 @@ import io.realm.annotations.PrimaryKey;
 /*
  * Created by mahmoud on 8/12/17.
  */
-@SuppressWarnings({"unused"})
+@SuppressWarnings({"unused", "FieldCanBeLocal"})
 public class Prayer extends RealmObject {
 
     @PrimaryKey
+    private String primaryKey;
     private long timestamp;
     private String whichPrayer;
     private String signature;
@@ -17,15 +18,16 @@ public class Prayer extends RealmObject {
     public Prayer() {
     }
 
-    public Prayer(String whichPrayer,
-                  long timestamp,
-                  String method,
-                  String school,
-                  String latitudeMethod, Location locationDetached) {
-        String timeZoneId = locationDetached.getTimezoneId();
-        this.signature = timeZoneId + method + school + latitudeMethod;
+    public Prayer(final String whichPrayer,
+                  final long timestamp,
+                  final String method,
+                  final String school,
+                  final String latitudeMethod,
+                  final String timezoneId) {
+        this.signature = timezoneId + method + school + latitudeMethod;
         this.whichPrayer = whichPrayer;
         this.timestamp = timestamp;
+        this.primaryKey = signature + whichPrayer + timestamp;
     }
 
     public long getTimestamp() {

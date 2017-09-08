@@ -71,7 +71,6 @@ class LocationModel {
             @Override
             public void onFailure(@NonNull Call<ReverseGeoLocResponse> call,
                                   @NonNull Throwable t) {
-                mLocationCallBack.onLocationError();
             }
         });
     }

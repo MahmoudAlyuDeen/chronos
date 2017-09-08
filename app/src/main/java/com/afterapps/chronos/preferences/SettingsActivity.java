@@ -1,6 +1,5 @@
 package com.afterapps.chronos.preferences;
 
-import android.appwidget.AppWidgetManager;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -12,8 +11,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.afterapps.chronos.R;
-import com.afterapps.chronos.widget.PrayersWidget;
 import com.mikepenz.aboutlibraries.LibsBuilder;
+
+import static com.afterapps.chronos.Utilities.updateHomeScreenWidget;
 
 /*
  * Created by Mahmoud on 10/6/2016.
@@ -34,23 +34,17 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        updateHomeScreenWidget();
-    }
-
-    protected void updateHomeScreenWidget() {
-        Intent invalidateWidget = new Intent(this, PrayersWidget.class);
-        invalidateWidget.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-        sendBroadcast(invalidateWidget);
+        updateHomeScreenWidget(this);
     }
 
     private void setupToolbar() {
-        ViewGroup rootView = (ViewGroup) findViewById(R.id.action_bar_root);
+        final ViewGroup rootView = (ViewGroup) findViewById(R.id.action_bar_root);
 
         if (rootView != null) {
-            View view = getLayoutInflater().inflate(R.layout.settings_toolbar, rootView, false);
+            final View view = getLayoutInflater().inflate(R.layout.settings_toolbar, rootView, false);
             rootView.addView(view, 0);
 
-            Toolbar toolbar = (Toolbar) findViewById(R.id.settings_toolbar);
+            final Toolbar toolbar = (Toolbar) findViewById(R.id.settings_toolbar);
             setSupportActionBar(toolbar);
             setTitle(R.string.action_settings);
         }
@@ -72,7 +66,7 @@ public class SettingsActivity extends AppCompatActivity {
         }
 
         private void setupAcknowledgementButtons() {
-            Preference libraries = findPreference(getString(R.string.preference_key_libraries));
+            final Preference libraries = findPreference(getString(R.string.preference_key_libraries));
             libraries.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
@@ -84,7 +78,7 @@ public class SettingsActivity extends AppCompatActivity {
                 }
             });
 
-            Preference api = findPreference(getString(R.string.preference_key_api));
+            final Preference api = findPreference(getString(R.string.preference_key_api));
             api.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {

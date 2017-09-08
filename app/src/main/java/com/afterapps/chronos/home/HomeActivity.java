@@ -1,6 +1,7 @@
 package com.afterapps.chronos.home;
 
-import android.animation.Animator;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -15,7 +16,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
-import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -25,14 +25,10 @@ import android.widget.TextView;
 import com.afterapps.chronos.BaseActivity;
 import com.afterapps.chronos.Constants;
 import com.afterapps.chronos.R;
-import com.afterapps.chronos.Utilities;
 import com.afterapps.chronos.beans.Prayer;
 import com.afterapps.chronos.job.PrayersJob;
 import com.afterapps.chronos.location.LocationActivity;
 import com.afterapps.chronos.preferences.SettingsActivity;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import com.mikepenz.iconics.IconicsDrawable;
 
 import org.greenrobot.eventbus.EventBus;
@@ -54,7 +50,15 @@ import icepick.State;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
+import static com.afterapps.chronos.Constants.DISPLAY_THRESHOLD;
 import static com.afterapps.chronos.Constants.FROM_ON_BOARDING;
+import static com.afterapps.chronos.Constants.NOTIFICATION_TAG_PRAYERS_READY;
+import static com.afterapps.chronos.Constants.PRAYER_NAMES;
+import static com.afterapps.chronos.Utilities.getDayTimeLogo;
+import static com.afterapps.chronos.Utilities.getUpcomingPrayers;
+import static com.afterapps.chronos.Utilities.startChainedSetRiseAnimation;
+import static com.afterapps.chronos.Utilities.startRiseAnimation;
+import static com.afterapps.chronos.Utilities.updateHomeScreenWidget;
 
 public class HomeActivity
         extends BaseActivity<HomeView, HomePresenter>
@@ -150,8 +154,11 @@ public class HomeActivity
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(PrayersJob.PrayersFetchedEvent event) {
-        //todo: hide notification
+        final NotificationManager mNotificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager.cancel(NOTIFICATION_TAG_PRAYERS_READY, event.getNotificationId());
         onSharedPreferenceChanged(mPref, "");
+        mConnectionErrorNotifyConfirmed = false;
     }
 
     @NonNull
@@ -214,11 +221,11 @@ public class HomeActivity
     @Override
     public void onPrayersReady(List<Prayer> prayersDetached) {
         mPrayerList = prayersDetached;
-        Utilities.updateHomeScreenWidget(this);
+        updateHomeScreenWidget(this);
         startTicking();
     }
 
-    void startTicking() {
+    private void startTicking() {
         mTickerHandler = new Handler();
         mTickerRunnable = new Runnable() {
             @Override
@@ -233,7 +240,7 @@ public class HomeActivity
         mTickerRunnable.run();
     }
 
-    void stopTicking() {
+    private void stopTicking() {
         if (mTickerHandler != null && mTickerRunnable != null) {
             mTickerHandler.removeCallbacks(mTickerRunnable);
         }
@@ -242,14 +249,8 @@ public class HomeActivity
     private void filterPrayers() {
         final Calendar calendar = Calendar.getInstance();
         final long currentTimestamp = calendar.getTimeInMillis();
-        final List<Prayer> allUpcomingPrayers =
-                Lists.newArrayList(Iterables.filter(mPrayerList, new Predicate<Prayer>() {
-                    @Override
-                    public boolean apply(Prayer prayer) {
-                        return prayer.getTimestamp() > currentTimestamp;
-                    }
-                }));
-        if (allUpcomingPrayers.size() < 6) {
+        final List<Prayer> allUpcomingPrayers = getUpcomingPrayers(mPrayerList, currentTimestamp);
+        if (allUpcomingPrayers.size() < DISPLAY_THRESHOLD) {
             onSharedPreferenceChanged(mPref, "");
             return;
         }
@@ -265,14 +266,14 @@ public class HomeActivity
         displayUpcomingPrayer();
         if (mUpcomingPrayers == null || mUpcomingPrayers.size() != allUpcomingPrayers.size()) {
             mUpcomingPrayers = allUpcomingPrayers;
-            final List<Prayer> upcomingPrayersTillTomorrow = allUpcomingPrayers.size() >= 6 ?
-                    allUpcomingPrayers.subList(0, 6) : allUpcomingPrayers;
+            final List<Prayer> upcomingPrayersTillTomorrow = allUpcomingPrayers.size() >= DISPLAY_THRESHOLD ?
+                    allUpcomingPrayers.subList(0, DISPLAY_THRESHOLD) : allUpcomingPrayers;
             displayPrayerSchedule(upcomingPrayersTillTomorrow);
         }
     }
 
     private void displayUpcomingLogo(final boolean firstTime, final long midnightTimestamp) {
-        IconicsDrawable upcomingLogo = Utilities.getDayTimeLogo(mPrayerList, midnightTimestamp, this);
+        final IconicsDrawable upcomingLogo = getDayTimeLogo(mPrayerList, midnightTimestamp, this);
         if (upcomingLogo == null) {
             return;
         }
@@ -323,8 +324,8 @@ public class HomeActivity
 
     @SuppressWarnings({"unchecked"})
     private void displayUpcomingPrayer() {
-        final HashMap<String, String[]> prayerNames = Constants.PRAYER_NAMES;
-        final String prayerTitle = prayerNames.get(mUpcomingPrayer.getWhichPrayer())[arabic ? 2 : 0];
+        final String prayerTitle = ((HashMap<String, String[]>) PRAYER_NAMES)
+                .get(mUpcomingPrayer.getWhichPrayer())[arabic ? 2 : 0];
         final long millisecondsUntilPrayer = mUpcomingPrayer.getTimestamp() - new Date().getTime();
         mHomeAppBarTimingTextView.setText(timeFormat.format(millisecondsUntilPrayer));
         mHomeAppBarTimingSubtitleTextView.setText(getString(R.string.up_next_subtitle, prayerTitle));
@@ -387,66 +388,5 @@ public class HomeActivity
         }
     }
 
-    private void startChainedSetRiseAnimation(final int displacement,
-                                              final IconicsDrawable newIcon,
-                                              final ImageView animatingImageView) {
-        animatingImageView.animate()
-                .alpha(0)
-                .translationYBy(displacement * 8)
-                .setDuration(3000)
-                .setInterpolator(new AccelerateDecelerateInterpolator())
-                .setListener(new Animator.AnimatorListener() {
-                    @Override
-                    public void onAnimationStart(Animator animation) {
 
-                    }
-
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
-                        animatingImageView.setImageDrawable(newIcon);
-                        startRiseAnimation(displacement, animatingImageView);
-                    }
-
-                    @Override
-                    public void onAnimationCancel(Animator animation) {
-
-                    }
-
-                    @Override
-                    public void onAnimationRepeat(Animator animation) {
-
-                    }
-                });
-    }
-
-    private void startRiseAnimation(final int displacement, final ImageView animatingImageView) {
-        animatingImageView.setTranslationY(0);
-        animatingImageView.setAlpha((float) 0);
-        animatingImageView.animate()
-                .alpha(1)
-                .translationYBy(-displacement)
-                .setDuration(1500)
-                .setInterpolator(new AccelerateDecelerateInterpolator())
-                .setListener(new Animator.AnimatorListener() {
-                    @Override
-                    public void onAnimationStart(Animator animation) {
-
-                    }
-
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
-                        animation.cancel();
-                    }
-
-                    @Override
-                    public void onAnimationCancel(Animator animation) {
-
-                    }
-
-                    @Override
-                    public void onAnimationRepeat(Animator animation) {
-
-                    }
-                });
-    }
 }

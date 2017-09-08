@@ -19,7 +19,10 @@ public class Application extends android.app.Application {
     public void onCreate() {
         super.onCreate();
         Realm.init(this);
-        RealmConfiguration config = new RealmConfiguration.Builder().build();
+        final RealmConfiguration config = new RealmConfiguration
+                .Builder()
+                .deleteRealmIfMigrationNeeded()
+                .build();
         Realm.setDefaultConfiguration(config);
 
         JobManager.create(this).addJobCreator(new TimingsJobCreator());

@@ -4,15 +4,22 @@ package com.afterapps.chronos.job;
  * Created by mahmoud on 9/6/17.
  */
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.v4.app.NotificationCompat;
 
 import com.afterapps.chronos.R;
-import com.afterapps.chronos.Utilities;
 import com.afterapps.chronos.api.Responses.TimingsResponse;
 import com.afterapps.chronos.beans.Location;
 import com.afterapps.chronos.beans.Prayer;
+import com.afterapps.chronos.home.HomeActivity;
 import com.afterapps.chronos.home.PrayerModel;
 import com.evernote.android.job.Job;
 import com.evernote.android.job.JobRequest;
@@ -20,20 +27,24 @@ import com.evernote.android.job.JobRequest;
 import org.greenrobot.eventbus.EventBus;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import io.realm.Realm;
 import retrofit2.Call;
 import retrofit2.Response;
 
+import static android.support.v4.app.NotificationCompat.PRIORITY_HIGH;
+import static com.afterapps.chronos.Constants.NOTIFICATION_TAG_PRAYERS_READY;
+import static com.afterapps.chronos.Utilities.updateHomeScreenWidget;
 import static com.afterapps.chronos.home.PrayerModel.isResponseValid;
 
 public class PrayersJob extends Job {
 
     public static final String TAG = "prayersJobTag";
 
-    public static int schedulePrayersJob() {
-        return new JobRequest.Builder(TAG)
+    public static void schedulePrayersJob() {
+        new JobRequest.Builder(TAG)
                 .setExecutionWindow(5L, 1000L)
                 .setBackoffCriteria(5_000L, JobRequest.BackoffPolicy.LINEAR)
                 .setRequiredNetworkType(JobRequest.NetworkType.CONNECTED)
@@ -65,7 +76,7 @@ public class PrayersJob extends Job {
         final String signature = location.getTimezoneId() + method + school + latitudeMethod;
         final Location locationDetached = realm.copyFromRealm(location);
         realm.close();
-        Result result = loadPrayers(signature) ? Result.SUCCESS :
+        final Result result = loadPrayers(signature) ? Result.SUCCESS :
                 fetchPrayers(method, school, latitudeMethod, locationDetached) ?
                         Result.SUCCESS : Result.RESCHEDULE;
         if (result == Result.SUCCESS) {
@@ -75,9 +86,36 @@ public class PrayersJob extends Job {
     }
 
     private void handleSuccess() {
-        Utilities.updateHomeScreenWidget(getContext());
-        //todo: show notification
-        EventBus.getDefault().post(new PrayersFetchedEvent());
+        updateHomeScreenWidget(getContext());
+        EventBus.getDefault().post(new PrayersFetchedEvent(showPrayersReadyNotification()));
+    }
+
+    private int showPrayersReadyNotification() {
+        final Intent home = new Intent(getContext(), HomeActivity.class);
+        home.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        home.setAction(Long.toString(new Date().getTime()));
+        final Uri notificationTone = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        final PendingIntent homePendingIntent =
+                PendingIntent.getActivity(getContext(), 0, home, PendingIntent.FLAG_CANCEL_CURRENT);
+
+        final NotificationCompat.Builder messageNotificationBuilder =
+                new NotificationCompat.Builder(getContext())
+                        .setSmallIcon(R.drawable.ic_notification)
+                        .setContentTitle(getContext().getString(R.string.notification_title_prayers_ready))
+                        .setContentText(getContext().getString(R.string.notification_body_prayers_ready))
+                        .setPriority(PRIORITY_HIGH)
+                        .setSound(notificationTone)
+                        .setVibrate(new long[]{500})
+                        .setAutoCancel(true)
+                        .setContentIntent(homePendingIntent);
+
+        final NotificationManager mNotificationManager =
+                (NotificationManager) getContext().getSystemService(Context.NOTIFICATION_SERVICE);
+        final int notificationId = (int) new Date().getTime();
+        mNotificationManager.notify(NOTIFICATION_TAG_PRAYERS_READY,
+                notificationId,
+                messageNotificationBuilder.build());
+        return notificationId;
     }
 
     private boolean loadPrayers(String signature) {
@@ -88,21 +126,21 @@ public class PrayersJob extends Job {
                                  final String school,
                                  final String latitudeMethod,
                                  final Location locationDetached) {
-        Call<TimingsResponse> currentMonthTimingsCall = PrayerModel.getTimingsCall(method,
+        final Call<TimingsResponse> currentMonthTimingsCall = PrayerModel.getTimingsCall(method,
                 school,
                 latitudeMethod,
                 locationDetached,
                 Calendar.getInstance(),
                 false);
-        Call<TimingsResponse> nextMonthTimingsCall = PrayerModel.getTimingsCall(method,
+        final Call<TimingsResponse> nextMonthTimingsCall = PrayerModel.getTimingsCall(method,
                 school,
                 latitudeMethod,
                 locationDetached,
                 Calendar.getInstance(),
                 true);
         try {
-            Response<TimingsResponse> currentMonthResponse = currentMonthTimingsCall.execute();
-            Response<TimingsResponse> nextMonthResponse = nextMonthTimingsCall.execute();
+            final Response<TimingsResponse> currentMonthResponse = currentMonthTimingsCall.execute();
+            final Response<TimingsResponse> nextMonthResponse = nextMonthTimingsCall.execute();
             return !(!isResponseValid(currentMonthResponse) || !isResponseValid(nextMonthResponse)) &&
                     storePrayers(currentMonthResponse.body(),
                             nextMonthResponse.body(),
@@ -110,7 +148,7 @@ public class PrayersJob extends Job {
                             school,
                             latitudeMethod,
                             locationDetached);
-        } catch (Exception ignored) {
+        } catch (Exception e) {
             return false;
         }
     }
@@ -144,5 +182,14 @@ public class PrayersJob extends Job {
     }
 
     public class PrayersFetchedEvent {
+        private final int notificationId;
+
+        public int getNotificationId() {
+            return notificationId;
+        }
+
+        PrayersFetchedEvent(int notificationId) {
+            this.notificationId = notificationId;
+        }
     }
 }
