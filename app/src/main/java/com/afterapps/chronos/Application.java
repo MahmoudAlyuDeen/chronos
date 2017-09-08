@@ -5,13 +5,20 @@ package com.afterapps.chronos;
  */
 
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Intent;
 import android.preference.PreferenceManager;
 
+import com.afterapps.chronos.home.HomeActivity;
 import com.afterapps.chronos.job.TimingsJobCreator;
 import com.evernote.android.job.JobManager;
 
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
+
+import static android.app.AlarmManager.RTC;
+import static com.afterapps.chronos.Constants.APPLICATION_CRASHED_FLAG;
 
 public class Application extends android.app.Application {
 
@@ -33,15 +40,32 @@ public class Application extends android.app.Application {
 //        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
 //            @Override
 //            public void uncaughtException(Thread thread, Throwable throwable) {
-//                Log.e("@@@@@", "uncaughtException: " + throwable.toString());
-//                Cat.e(throwable);
-//                Intent splash = new Intent(getApplicationContext(), SplashActivity.class);
-//                splash.putExtra(SPLASH_CRASHED_FLAG, true);
-//                PendingIntent splashPending = PendingIntent.getActivity(getBaseContext(), 0, splash, 0);
-//                AlarmManager mgr = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-//                mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 100, splashPending);
-//                System.exit(2);
+//                throwable.printStackTrace();
+//                restartApplication(true);
 //            }
 //        });
+    }
+
+    public void clearDatabaseAndRestart() {
+        final Realm realm = Realm.getDefaultInstance();
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                realm.deleteAll();
+            }
+        });
+        realm.close();
+        restartApplication(false);
+    }
+
+    public void restartApplication(final boolean isUncaughtException) {
+        final Intent home = new Intent(getApplicationContext(), HomeActivity.class);
+        if (isUncaughtException) {
+            home.putExtra(APPLICATION_CRASHED_FLAG, true);
+        }
+        final PendingIntent homePending = PendingIntent.getActivity(getBaseContext(), 0, home, 0);
+        AlarmManager mgr = (AlarmManager) getSystemService(ALARM_SERVICE);
+        mgr.set(RTC, System.currentTimeMillis() + 100, homePending);
+        System.exit(2);
     }
 }

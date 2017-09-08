@@ -22,6 +22,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.afterapps.chronos.Application;
 import com.afterapps.chronos.BaseActivity;
 import com.afterapps.chronos.Constants;
 import com.afterapps.chronos.R;
@@ -380,13 +381,11 @@ public class HomeActivity
                 onSharedPreferenceChanged(mPref, "");
                 break;
             case R.id.home_logic_error_clear_button:
-                //todo
+                ((Application) getApplication()).clearDatabaseAndRestart();
                 break;
             case R.id.home_logic_error_restart_button:
-                //todo
+                ((Application) getApplication()).restartApplication(false);
                 break;
         }
     }
-
-
 }

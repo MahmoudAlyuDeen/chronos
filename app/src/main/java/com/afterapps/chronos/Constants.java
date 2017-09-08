@@ -12,6 +12,8 @@ public class Constants {
     private Constants() {
     }
 
+    public static final String APPLICATION_CRASHED_FLAG = "applicationCrashedFlag";
+
     public static final String PLAY_SERVICES_LINK = "https://play.google.com/store/apps/details?id=com.google.android.gms";
 
     public static final String FROM_ON_BOARDING = "locationOpenedFromEmptyState";
