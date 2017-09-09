@@ -8,7 +8,6 @@
 .idea/runConfigurations.xml
 app/libs/
 app/src/androidTest/
-app/src/main/res/drawable/
 app/src/test/
 ### Android template
 # Built application files
