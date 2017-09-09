@@ -4,10 +4,13 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.customtabs.CustomTabsIntent;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -47,7 +50,6 @@ import java.util.TimeZone;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import icepick.State;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
@@ -57,6 +59,8 @@ import static com.afterapps.chronos.Constants.NOTIFICATION_TAG_PRAYERS_READY;
 import static com.afterapps.chronos.Constants.PRAYER_NAMES;
 import static com.afterapps.chronos.Utilities.getDayTimeLogo;
 import static com.afterapps.chronos.Utilities.getUpcomingPrayers;
+import static com.afterapps.chronos.Utilities.getWillNotify;
+import static com.afterapps.chronos.Utilities.setWillNotify;
 import static com.afterapps.chronos.Utilities.startChainedSetRiseAnimation;
 import static com.afterapps.chronos.Utilities.startRiseAnimation;
 import static com.afterapps.chronos.Utilities.updateHomeScreenWidget;
@@ -113,9 +117,6 @@ public class HomeActivity
     private Prayer mUpcomingPrayer;
     private IconicsDrawable mUpcomingLogo;
 
-    @State
-    boolean mConnectionErrorNotifyConfirmed;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -159,7 +160,6 @@ public class HomeActivity
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.cancel(NOTIFICATION_TAG_PRAYERS_READY, event.getNotificationId());
         onSharedPreferenceChanged(mPref, "");
-        mConnectionErrorNotifyConfirmed = false;
     }
 
     @NonNull
@@ -177,6 +177,10 @@ public class HomeActivity
                 getString(R.string.preference_default_school));
         final String latitudeMethod = mPref.getString(getString(R.string.preference_key_latitude),
                 getString(R.string.preference_default_latitude));
+        mUpcomingPrayer = null;
+        mUpcomingPrayers = null;
+        mPrayerList = null;
+        mUpcomingLogo = null;
         presenter.getPrayers(method, school, latitudeMethod);
     }
 
@@ -207,7 +211,7 @@ public class HomeActivity
                 break;
             case Constants.VIEW_STATE_ACTION:
                 mHomeConnectionErrorParent.setVisibility(VISIBLE);
-                if (mConnectionErrorNotifyConfirmed) {
+                if (getWillNotify(this)) {
                     mHomeConnectionErrorNotifyConfirmationTextView.setVisibility(VISIBLE);
                 } else {
                     mHomeConnectionErrorPromptParent.setVisibility(VISIBLE);
@@ -220,7 +224,7 @@ public class HomeActivity
     }
 
     @Override
-    public void onPrayersReady(List<Prayer> prayersDetached) {
+    public void onPrayersReady(final List<Prayer> prayersDetached) {
         mPrayerList = prayersDetached;
         updateHomeScreenWidget(this);
         startTicking();
@@ -355,6 +359,12 @@ public class HomeActivity
                 final Intent settings = new Intent(this, SettingsActivity.class);
                 startActivity(settings);
                 return true;
+            case R.id.action_qibla:
+                final CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder()
+                        .setToolbarColor(ContextCompat.getColor(this, R.color.colorPrimaryDark));
+                final CustomTabsIntent customTabsIntent = builder.build();
+                customTabsIntent.launchUrl(this, Uri.parse(getString(R.string.qibla_with_google_url)));
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -374,7 +384,7 @@ public class HomeActivity
                 break;
             case R.id.home_connection_error_notify_button:
                 PrayersJob.schedulePrayersJob();
-                mConnectionErrorNotifyConfirmed = true;
+                setWillNotify(this, true);
                 displayViewState();
                 break;
             case R.id.home_connection_error_retry_button:

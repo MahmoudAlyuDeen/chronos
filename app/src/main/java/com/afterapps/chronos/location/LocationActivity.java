@@ -35,6 +35,9 @@ import io.realm.OrderedRealmCollection;
 import io.realm.Realm;
 import pub.devrel.easypermissions.EasyPermissions;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+import static com.afterapps.chronos.Constants.VIEW_STATE_PROGRESS;
 import static com.afterapps.chronos.Utilities.updateHomeScreenWidget;
 
 public class LocationActivity
@@ -51,6 +54,8 @@ public class LocationActivity
     LinearLayout mLocationAdd;
     @BindView(R.id.locations_recycler)
     RecyclerView mLocationsRecycler;
+    @BindView(R.id.location_progress)
+    LinearLayout mLocationProgress;
 
     private Realm mRealm;
 
@@ -163,8 +168,14 @@ public class LocationActivity
     }
 
     @Override
+    protected void onChangeSettingsDenied() {
+        showLocationMethodDialog();
+    }
+
+    @Override
     public void onLocationChanged(android.location.Location geoLocation) {
         presenter.onLocationDetected(geoLocation);
+
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -190,8 +201,18 @@ public class LocationActivity
     }
 
     @Override
-    public void onLocationError() {
-        showLocationDetectionError();
+    public void onReverseGeolocationError() {
+        showReverseGeolocationError();
+    }
+
+    private void showReverseGeolocationError() {
+        Snackbar.make(mLocationsRecycler, R.string.error_reverse_geolocation, Snackbar.LENGTH_INDEFINITE)
+                .setAction(R.string.action_location_manual, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        startAutoCompleteOverlay();
+                    }
+                }).show();
     }
 
     @Override
@@ -210,5 +231,10 @@ public class LocationActivity
     @Override
     public void onPermissionsDenied(int requestCode, List<String> perms) {
         showLocationMethodDialog();
+    }
+
+    @Override
+    protected void displayViewState() {
+        mLocationProgress.setVisibility(viewState == VIEW_STATE_PROGRESS ? VISIBLE : GONE);
     }
 }

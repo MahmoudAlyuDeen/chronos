@@ -17,19 +17,32 @@ class LocationPresenter extends MvpBasePresenter<LocationView> implements Locati
             mLocationModel = new LocationModel(this);
         }
         mLocationModel.onLocationDetected(geoLocation);
+        if (isViewAttached() && getView() != null) {
+            getView().showProgress();
+        }
     }
 
     @Override
     public void onLocationHandled() {
         if (isViewAttached() && getView() != null) {
             getView().onLocationHandled();
+            getView().showContent();
         }
     }
 
     @Override
-    public void onLocationError() {
+    public void onReverseGeolocationError() {
         if (isViewAttached() && getView() != null) {
-            getView().onLocationError();
+            getView().onReverseGeolocationError();
+            getView().showContent();
+        }
+    }
+
+    @Override
+    public void onConnectionError() {
+        if (isViewAttached() && getView() != null) {
+            getView().showConnectionError();
+            getView().showContent();
         }
     }
 

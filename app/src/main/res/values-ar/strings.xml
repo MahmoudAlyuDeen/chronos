@@ -21,7 +21,7 @@
     <string name="preference_title_school">المذهب</string>
     <string name="preferences_title_acknowledgement">هذا البرنامج يعمل بفضل</string>
     <string name="preferences_title_prayer_timings">مواقيت الصلاة</string>
-    <string name="error_reverse_geo">لم تتم إضافة الموقع، وقت النظام غير مضبوط بشكل صحيح</string>
+    <string name="error_reverse_geolocation">لم تتم إضافة الموقع، وقت النظام غير مضبوط بشكل صحيح</string>
     <string name="preference_title_libraries">مكتبات البرمجيات</string>
     <string name="preference_title_api">مصدر المواقيت</string>
     <string name="noun_subtitle">اسم</string>
@@ -42,4 +42,5 @@
     <string name="error_play_services">يجب أن يكون لديك Google play services</string>
     <string name="ok">حسنا</string>
     <string name="rationale_location">إذن الموفع مطلوب لنتمكن من تحديد موقعك</string>
+    <string name="qibla_with_google_url">https://qiblafinder.withgoogle.com/intl/ar/</string>
 </resources>

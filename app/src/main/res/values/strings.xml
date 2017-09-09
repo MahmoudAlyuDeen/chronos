@@ -6,6 +6,8 @@
     <string name="placeholder_timing" translatable="false">00:00</string>
     <string name="geo_api_key" translatable="false">AIzaSyCUSRQAQCa5CmKPWe_VWdlArClGjQTXAZE</string>
     <string name="about_api_url" translatable="false">http://aladhan.com/about</string>
+    <string name="mosque_design_url" translatable="false">http://www.freepik.com/free-vector/mosque-silhouette-in-night-sky-with-crescent-moon-and-stars_870865.htm</string>
+    <string name="qibla_with_google_url">https://qiblafinder.withgoogle.com/intl/en/</string>
 
     <!--home screen-->
     <string name="up_next_title">You have</string>
@@ -16,6 +18,7 @@
     <string name="sub_header_tomorrow">Tomorrow</string>
     <string name="action_notify">Notify</string>
     <string name="action_retry">Retry</string>
+    <string name="action_qibla">Qibla direction</string>
 
     <!--empty state / intro-->
     <string name="intro_miqat_definition">Mīqāt (Arabic: ميقات) ‎‎means a stated place or time to establish a religious ritual.</string>
@@ -31,7 +34,7 @@
     <!--errors and warnings-->
     <string name="error_connection_title">Can\'t load prayers</string>
     <string name="error_connection_prompt">No internet connection. We can notify you when prayers are available.</string>
-    <string name="error_reverse_geo">Can\'t add location; system time is not set correctly</string>
+    <string name="error_reverse_geolocation">Can\'t add location; system time is not set correctly</string>
     <string name="error_play_services">Google Play Services must be installed</string>
 
     <!--preferences-->
@@ -82,6 +85,8 @@
 
     <!--home screen widget-->
     <string name="empty_state_widget">Prayers not loaded yet. Tap to open the app</string>
+
+    <!--notifications-->
     <string name="notification_body_prayers_ready">You tried to view timings when you were offline.</string>
     <string name="notification_title_prayers_ready">View prayer timings in Miqat</string>
 

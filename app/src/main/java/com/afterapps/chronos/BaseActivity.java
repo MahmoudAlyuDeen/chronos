@@ -10,6 +10,13 @@ import com.hannesdorfmann.mosby3.mvp.MvpView;
 import icepick.Icepick;
 import icepick.State;
 
+import static com.afterapps.chronos.Constants.VIEW_STATE_ACTION;
+import static com.afterapps.chronos.Constants.VIEW_STATE_CONTENT;
+import static com.afterapps.chronos.Constants.VIEW_STATE_EMPTY;
+import static com.afterapps.chronos.Constants.VIEW_STATE_ERROR;
+import static com.afterapps.chronos.Constants.VIEW_STATE_IDLE;
+import static com.afterapps.chronos.Constants.VIEW_STATE_PROGRESS;
+
 @SuppressWarnings("unused")
 public abstract class BaseActivity<V extends MvpView, P extends MvpPresenter<V>>
         extends MvpActivity<V, P>
@@ -30,27 +37,27 @@ public abstract class BaseActivity<V extends MvpView, P extends MvpPresenter<V>>
     }
 
     public void showProgress() {
-        viewState = Constants.VIEW_STATE_PROGRESS;
+        viewState = VIEW_STATE_PROGRESS;
         displayViewState();
     }
 
     public void showError() {
-        viewState = Constants.VIEW_STATE_ERROR;
+        viewState = VIEW_STATE_ERROR;
         displayViewState();
     }
 
     public void showEmpty() {
-        viewState = Constants.VIEW_STATE_EMPTY;
+        viewState = VIEW_STATE_EMPTY;
         displayViewState();
     }
 
     public void showContent() {
-        viewState = Constants.VIEW_STATE_CONTENT;
+        viewState = VIEW_STATE_CONTENT;
         displayViewState();
     }
 
     public void showAction() {
-        viewState = Constants.VIEW_STATE_ACTION;
+        viewState = VIEW_STATE_ACTION;
         displayViewState();
     }
 
@@ -62,7 +69,7 @@ public abstract class BaseActivity<V extends MvpView, P extends MvpPresenter<V>>
         landscape = getResources().getBoolean(R.bool.landscape);
         arabic = getResources().getBoolean(R.bool.arabic);
         if (savedInstanceState == null) {
-            viewState = Constants.VIEW_STATE_IDLE;
+            viewState = VIEW_STATE_IDLE;
             userInteracted = false;
         }
     }

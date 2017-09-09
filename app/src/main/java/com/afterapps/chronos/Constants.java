@@ -12,6 +12,10 @@ public class Constants {
     private Constants() {
     }
 
+    public static final long LOCATION_REQUEST_TIMEOUT = 100000;
+    
+    public static final String WILL_NOTIFY_FLAG = "willNotifyFlag";
+
     public static final String APPLICATION_CRASHED_FLAG = "applicationCrashedFlag";
 
     public static final String PLAY_SERVICES_LINK = "https://play.google.com/store/apps/details?id=com.google.android.gms";

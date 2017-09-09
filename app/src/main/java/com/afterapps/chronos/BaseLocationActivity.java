@@ -35,10 +35,13 @@ import com.hannesdorfmann.mosby3.mvp.MvpView;
 import icepick.State;
 import pub.devrel.easypermissions.EasyPermissions;
 
+import static com.afterapps.chronos.Constants.LOCATION_REQUEST_TIMEOUT;
+
 public abstract class BaseLocationActivity<V extends MvpView, P extends MvpPresenter<V>>
         extends BaseActivity<V, P>
         implements ResultCallback<LocationSettingsResult>,
-        LocationListener, GoogleApiClient.ConnectionCallbacks {
+        LocationListener,
+        GoogleApiClient.ConnectionCallbacks {
 
     private static final int REQUEST_PERMISSION = 1;
     private static final int REQUEST_CHECK_SETTINGS = 2;
@@ -46,9 +49,13 @@ public abstract class BaseLocationActivity<V extends MvpView, P extends MvpPrese
     @State
     protected boolean askedForLocationPermission;
 
+    @State
+    protected boolean isWaitingForLocation;
+
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
     private FusedLocationProviderClient mFusedLocationProviderClient;
+    private LocationCallback mLocationCallback;
 
     @NonNull
     @Override
@@ -68,6 +75,19 @@ public abstract class BaseLocationActivity<V extends MvpView, P extends MvpPrese
         super.onStop();
         if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
             mGoogleApiClient.disconnect();
+        }
+        if (mFusedLocationProviderClient != null && mLocationCallback != null) {
+            isWaitingForLocation = true;
+            mFusedLocationProviderClient.removeLocationUpdates(mLocationCallback);
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (isWaitingForLocation) {
+            connectLocationClient();
+            isWaitingForLocation = false;
         }
     }
 
@@ -89,7 +109,7 @@ public abstract class BaseLocationActivity<V extends MvpView, P extends MvpPrese
                 showAction();
             } else {
                 askedForLocationPermission = true;
-                String[] perms = {Manifest.permission.ACCESS_FINE_LOCATION,
+                final String[] perms = {Manifest.permission.ACCESS_FINE_LOCATION,
                         Manifest.permission.ACCESS_COARSE_LOCATION};
                 EasyPermissions.requestPermissions(this,
                         getString(R.string.rationale_location),
@@ -105,15 +125,13 @@ public abstract class BaseLocationActivity<V extends MvpView, P extends MvpPrese
 
         mLocationRequest = LocationRequest.create();
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        mLocationRequest.setExpirationDuration(60000);
-        mLocationRequest.setInterval(10000);
-        mLocationRequest.setFastestInterval(500);
+        mLocationRequest.setExpirationDuration(LOCATION_REQUEST_TIMEOUT);
         mLocationRequest.setNumUpdates(1);
 
-        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
+        final LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
                 .setAlwaysShow(true)
                 .addLocationRequest(mLocationRequest);
-        PendingResult<LocationSettingsResult> result =
+        final PendingResult<LocationSettingsResult> result =
                 LocationServices.SettingsApi.checkLocationSettings(mGoogleApiClient,
                         builder.build());
         result.setResultCallback(BaseLocationActivity.this);
@@ -130,14 +148,16 @@ public abstract class BaseLocationActivity<V extends MvpView, P extends MvpPrese
                                 != PackageManager.PERMISSION_GRANTED) {
                     return;
                 }
+                mLocationCallback = new LocationCallback() {
+                    @Override
+                    public void onLocationResult(LocationResult locationResult) {
+                        showContent();
+                        onLocationChanged(locationResult.getLastLocation());
+                    }
+                };
                 mFusedLocationProviderClient
-                        .requestLocationUpdates(mLocationRequest, new LocationCallback() {
-                            @Override
-                            public void onLocationResult(LocationResult locationResult) {
-                                onLocationChanged(locationResult.getLastLocation());
-                            }
-                        }, Looper.myLooper());
-
+                        .requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.myLooper());
+                showProgress();
                 break;
             case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
                 try {
@@ -154,7 +174,9 @@ public abstract class BaseLocationActivity<V extends MvpView, P extends MvpPrese
     protected abstract void showLocationDetectionError();
 
     @Override
-    public abstract void onLocationChanged(Location location);
+    public void onLocationChanged(Location location) {
+        isWaitingForLocation = false;
+    }
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
@@ -167,17 +189,17 @@ public abstract class BaseLocationActivity<V extends MvpView, P extends MvpPrese
             case REQUEST_CHECK_SETTINGS:
                 switch (resultCode) {
                     case Activity.RESULT_OK:
-                        // All required changes were successfully made
                         checkLocationPermissionAndRequestLocation();
                         break;
                     case Activity.RESULT_CANCELED:
-                        // The user was asked to change settings, but chose not to
-                        showAction();
+                        onChangeSettingsDenied();
                         break;
                 }
                 break;
         }
     }
+
+    protected abstract void onChangeSettingsDenied();
 
     @Override
     public void onConnectionSuspended(int i) {

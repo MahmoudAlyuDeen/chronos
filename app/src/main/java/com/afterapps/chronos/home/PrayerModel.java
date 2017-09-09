@@ -22,7 +22,6 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import static com.afterapps.chronos.Constants.FETCH_THRESHOLD;
-import static com.afterapps.chronos.Constants.PREFETCH_THRESHOLD;
 
 public class PrayerModel {
 
@@ -64,9 +63,10 @@ public class PrayerModel {
             fetchPrayers(method, school, latitudeMethod, locationDetached, true);
             fetchPrayers(method, school, latitudeMethod, locationDetached, false);
         } else {
-            if (prayersDetached.size() < PREFETCH_THRESHOLD) {
-                fetchPrayers(method, school, latitudeMethod, locationDetached, true);
-            }
+//            todo
+//            if (prayersDetached.size() < PREFETCH_THRESHOLD) {
+//                fetchPrayers(method, school, latitudeMethod, locationDetached, true);
+//            }
             mPrayerCallback.onPrayersReady(prayersDetached);
         }
     }

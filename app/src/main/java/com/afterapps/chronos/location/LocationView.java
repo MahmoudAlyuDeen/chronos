@@ -10,5 +10,11 @@ interface LocationView extends MvpView {
 
     void onLocationHandled();
 
-    void onLocationError();
+    void onReverseGeolocationError();
+
+    void showConnectionError();
+
+    void showProgress();
+
+    void showContent();
 }

@@ -27,7 +27,9 @@ class LocationModel {
 
         void onLocationHandled();
 
-        void onLocationError();
+        void onReverseGeolocationError();
+
+        void onConnectionError();
     }
 
     private final LocationCallBack mLocationCallBack;
@@ -64,13 +66,14 @@ class LocationModel {
                     selectLocation(response.body().getTimeZoneId());
                     mLocationCallBack.onLocationHandled();
                 } else {
-                    mLocationCallBack.onLocationError();
+                    mLocationCallBack.onReverseGeolocationError();
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<ReverseGeoLocResponse> call,
                                   @NonNull Throwable t) {
+                mLocationCallBack.onConnectionError();
             }
         });
     }

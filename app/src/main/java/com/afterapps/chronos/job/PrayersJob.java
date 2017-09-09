@@ -36,6 +36,8 @@ import retrofit2.Response;
 
 import static android.support.v4.app.NotificationCompat.PRIORITY_HIGH;
 import static com.afterapps.chronos.Constants.NOTIFICATION_TAG_PRAYERS_READY;
+import static com.afterapps.chronos.Utilities.getWillNotify;
+import static com.afterapps.chronos.Utilities.setWillNotify;
 import static com.afterapps.chronos.Utilities.updateHomeScreenWidget;
 import static com.afterapps.chronos.home.PrayerModel.isResponseValid;
 
@@ -59,12 +61,13 @@ public class PrayersJob extends Job {
     @NonNull
     protected Result onRunJob(Params params) {
         final Realm realm = Realm.getDefaultInstance();
-        final SharedPreferences mPref = PreferenceManager.getDefaultSharedPreferences(getContext());
-        final String method = mPref.getString(getContext().getString(R.string.preference_key_method),
+        final SharedPreferences preferences =
+                PreferenceManager.getDefaultSharedPreferences(getContext());
+        final String method = preferences.getString(getContext().getString(R.string.preference_key_method),
                 getContext().getString(R.string.preference_default_method));
-        final String school = mPref.getString(getContext().getString(R.string.preference_key_school),
+        final String school = preferences.getString(getContext().getString(R.string.preference_key_school),
                 getContext().getString(R.string.preference_default_school));
-        final String latitudeMethod = mPref.getString(getContext().getString(R.string.preference_key_latitude),
+        final String latitudeMethod = preferences.getString(getContext().getString(R.string.preference_key_latitude),
                 getContext().getString(R.string.preference_default_latitude));
         final Location location = realm.where(Location.class)
                 .equalTo("selected", true)
@@ -87,7 +90,10 @@ public class PrayersJob extends Job {
 
     private void handleSuccess() {
         updateHomeScreenWidget(getContext());
-        EventBus.getDefault().post(new PrayersFetchedEvent(showPrayersReadyNotification()));
+        if (getWillNotify(getContext())) {
+            EventBus.getDefault().post(new PrayersFetchedEvent(showPrayersReadyNotification()));
+            setWillNotify(getContext(), false);
+        }
     }
 
     private int showPrayersReadyNotification() {

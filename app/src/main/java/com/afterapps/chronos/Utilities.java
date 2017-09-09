@@ -5,10 +5,12 @@ package com.afterapps.chronos;
  */
 
 import android.animation.Animator;
+import android.annotation.SuppressLint;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
@@ -29,6 +31,7 @@ import java.util.Date;
 import java.util.List;
 
 import static com.afterapps.chronos.Constants.DISPLAY_THRESHOLD;
+import static com.afterapps.chronos.Constants.WILL_NOTIFY_FLAG;
 
 public class Utilities {
     private Utilities() {
@@ -190,5 +193,19 @@ public class Utilities {
                     public void onAnimationRepeat(Animator animation) {
                     }
                 });
+    }
+
+
+    @SuppressLint("ApplySharedPref")
+    public static void setWillNotify(Context context, final boolean willNotify) {
+        PreferenceManager.getDefaultSharedPreferences(context)
+                .edit()
+                .putBoolean(WILL_NOTIFY_FLAG, willNotify)
+                .commit();
+    }
+
+    public static boolean getWillNotify(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context)
+                .getBoolean(WILL_NOTIFY_FLAG, false);
     }
 }

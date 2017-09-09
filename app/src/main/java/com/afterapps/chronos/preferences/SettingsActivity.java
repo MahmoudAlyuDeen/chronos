@@ -87,6 +87,16 @@ public class SettingsActivity extends AppCompatActivity {
                     return true;
                 }
             });
+
+            final Preference mosqueArt = findPreference(getString(R.string.preference_key_design));
+            mosqueArt.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    startActivity(new Intent(Intent.ACTION_VIEW,
+                            Uri.parse(getString(R.string.mosque_design_url))));
+                    return true;
+                }
+            });
         }
     }
 }

@@ -17,7 +17,7 @@
             android:id="@+id/places_toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:navigationIcon="@drawable/ic_back"
+            app:navigationIcon="@drawable/ic_close"
             app:title="@string/title_location"/>
 
     </android.support.design.widget.AppBarLayout>
@@ -35,39 +35,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <LinearLayout
-                android:id="@+id/location_add"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:foreground="?attr/selectableItemBackground"
-                android:minHeight="?attr/listPreferredItemHeight"
-                android:orientation="horizontal"
-                android:padding="@dimen/simple_padding_medium"
-                tools:ignore="UseCompoundDrawables">
-
-                <ImageView
-                    android:id="@+id/item_location_active_radio_button"
-                    android:layout_width="@dimen/location_radio_size"
-                    android:layout_height="@dimen/location_radio_size"
-                    android:layout_margin="@dimen/simple_padding_medium"
-                    android:src="@drawable/ic_add_accent"
-                    tools:ignore="ContentDescription"/>
-
-                <TextView
-                    android:id="@+id/item_location_title_text_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_margin="@dimen/simple_padding_medium"
-                    android:ellipsize="end"
-                    android:gravity="start"
-                    android:lines="1"
-                    android:text="@string/action_add_location"
-                    android:textColor="@color/colorTextPrimary"
-                    android:textSize="@dimen/text_size_primary"
-                    android:textStyle="bold"/>
-
-            </LinearLayout>
+            <include layout="@layout/location_add"/>
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/locations_recycler"
@@ -77,6 +45,8 @@
                 android:isScrollContainer="true"
                 app:layoutManager="android.support.v7.widget.LinearLayoutManager"
                 tools:listitem="@layout/item_location"/>
+
+            <include layout="@layout/item_location_progress"/>
 
         </LinearLayout>
 

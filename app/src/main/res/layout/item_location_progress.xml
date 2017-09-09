@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/location_progress"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:minHeight="?attr/listPreferredItemHeight"
+    android:orientation="horizontal"
+    android:padding="@dimen/simple_padding_small"
+    tools:ignore="UseCompoundDrawables">
+
+    <ImageView
+        android:layout_width="@dimen/location_radio_size"
+        android:layout_height="@dimen/location_radio_size"
+        android:layout_margin="@dimen/simple_padding_medium"
+        android:padding="@dimen/simple_padding_medium"
+        android:src="@drawable/opaque_circle"
+        tools:ignore="ContentDescription"/>
+
+    <com.elyeproj.loaderviewlibrary.LoaderTextView
+        android:layout_width="@dimen/progress_primary_text_size"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/simple_padding_medium"
+        android:text="@string/empty_string"
+        android:textSize="@dimen/text_size_secondary"/>
+
+</LinearLayout>
