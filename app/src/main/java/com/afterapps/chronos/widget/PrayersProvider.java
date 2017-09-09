@@ -9,7 +9,6 @@ import android.widget.RemoteViewsService;
 
 import com.afterapps.chronos.Constants;
 import com.afterapps.chronos.R;
-import com.afterapps.chronos.Utilities;
 import com.afterapps.chronos.beans.Location;
 import com.afterapps.chronos.beans.Prayer;
 import com.afterapps.chronos.job.PrayersJob;
@@ -26,6 +25,7 @@ import io.realm.Realm;
 import io.realm.Sort;
 
 import static com.afterapps.chronos.Constants.DISPLAY_THRESHOLD;
+import static com.afterapps.chronos.Utilities.getPrayerIcon;
 import static com.afterapps.chronos.Utilities.getPrayersForDay;
 
 /*
@@ -139,7 +139,7 @@ class PrayersProvider implements RemoteViewsService.RemoteViewsFactory {
         final String prayerTitle = prayerNames.get(prayer.getWhichPrayer())[mArabic ? 2 : 0];
         final String prayerSubtitle = prayerNames.get(prayer.getWhichPrayer())[mArabic ? 3 : 1];
         final String formattedTimestamp = timeFormat.format(prayer.getTimestamp());
-        final IconicsDrawable prayerIcon = Utilities.getPrayerIcon(prayer, mContext);
+        final IconicsDrawable prayerIcon = getPrayerIcon(prayer, mContext, R.color.colorTextSecondary);
 
         itemRemoteView.setTextViewText(R.id.item_prayer_title_text_view, prayerTitle);
         itemRemoteView.setTextViewText(R.id.item_prayer_subtitle_text_view, prayerSubtitle);

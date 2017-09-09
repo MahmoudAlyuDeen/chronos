@@ -39,6 +39,7 @@ import static com.afterapps.chronos.Constants.NOTIFICATION_TAG_PRAYERS_READY;
 import static com.afterapps.chronos.Utilities.getWillNotify;
 import static com.afterapps.chronos.Utilities.setWillNotify;
 import static com.afterapps.chronos.Utilities.updateHomeScreenWidget;
+import static com.afterapps.chronos.home.PrayerModel.getTimingsCall;
 import static com.afterapps.chronos.home.PrayerModel.isResponseValid;
 
 public class PrayersJob extends Job {
@@ -132,13 +133,13 @@ public class PrayersJob extends Job {
                                  final String school,
                                  final String latitudeMethod,
                                  final Location locationDetached) {
-        final Call<TimingsResponse> currentMonthTimingsCall = PrayerModel.getTimingsCall(method,
+        final Call<TimingsResponse> currentMonthTimingsCall = getTimingsCall(method,
                 school,
                 latitudeMethod,
                 locationDetached,
                 Calendar.getInstance(),
                 false);
-        final Call<TimingsResponse> nextMonthTimingsCall = PrayerModel.getTimingsCall(method,
+        final Call<TimingsResponse> nextMonthTimingsCall = getTimingsCall(method,
                 school,
                 latitudeMethod,
                 locationDetached,
@@ -159,6 +160,7 @@ public class PrayersJob extends Job {
         }
     }
 
+    @SuppressWarnings("SameReturnValue")
     private boolean storePrayers(
             final TimingsResponse currentMonthResponse,
             final TimingsResponse nextMonthResponse,

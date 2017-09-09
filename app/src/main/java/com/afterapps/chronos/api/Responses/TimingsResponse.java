@@ -143,7 +143,6 @@ public class TimingsResponse {
                     if (timing == null) continue;
                     final String whichPrayer = field.getName();
                     final Calendar calendar = Calendar.getInstance();
-                    final long currentTimestamp = calendar.getTimeInMillis();
                     calendar.setTimeInMillis(dayTimestamp * 1000);
                     final int currentMonth = calendar.get(Calendar.MONTH);
                     final int currentYear = calendar.get(Calendar.YEAR);

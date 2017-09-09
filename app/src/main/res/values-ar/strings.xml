@@ -9,7 +9,7 @@
     <string name="up_next_title">يتبقى</string>
     <string name="intro_miqat_definition">الميقات هو ما وُقِتَ به، أي حُدِدَ من زمان. وقيل هو زمن العبادة ومكانها.</string>
     <string name="up_next_subtitle">حتى %1$s</string>
-    <string name="error_connection_title">مواقيت الصلاة غير متاحة، تأكد من وجود اتصال انترنت.</string>
+    <string name="home_error_connection_title">مواقيت الصلاة غير متاحة، تأكد من وجود اتصال انترنت.</string>
     <string name="preference_dialog_title_latitude">إختر طريقة الحساب</string>
     <string name="preference_dialog_title_method">إختر طريقة الحساب</string>
     <string name="preference_dialog_title_school">إختر المذهب</string>
@@ -21,7 +21,7 @@
     <string name="preference_title_school">المذهب</string>
     <string name="preferences_title_acknowledgement">هذا البرنامج يعمل بفضل</string>
     <string name="preferences_title_prayer_timings">مواقيت الصلاة</string>
-    <string name="error_reverse_geolocation">لم تتم إضافة الموقع، وقت النظام غير مضبوط بشكل صحيح</string>
+    <string name="location_error_reverse_geolocation">لم تتم إضافة الموقع، وقت النظام غير مضبوط بشكل صحيح</string>
     <string name="preference_title_libraries">مكتبات البرمجيات</string>
     <string name="preference_title_api">مصدر المواقيت</string>
     <string name="noun_subtitle">اسم</string>
@@ -43,4 +43,18 @@
     <string name="ok">حسنا</string>
     <string name="rationale_location">إذن الموفع مطلوب لنتمكن من تحديد موقعك</string>
     <string name="qibla_with_google_url">https://qiblafinder.withgoogle.com/intl/ar/</string>
+    <string name="action_clear">مسح</string>
+    <string name="action_notify">بلغني</string>
+    <string name="action_qibla">إتجاه القبلة</string>
+    <string name="action_restart">إعادة التشغيل</string>
+    <string name="action_retry">إعادة المحاولة</string>
+    <string name="empty_state_widget">لم يتم تحميل الصلوات بعد، اضغط هنا لفتح التطبيق</string>
+    <string name="home_error_connection_notify_confirmation">سنقوم بإبلاغك فور توافر المواقيت</string>
+    <string name="home_error_connection_prompt">لا يوجد إتصال انترنت، يمكنا فور توافر المواقيت</string>
+    <string name="home_error_logic_prompt">جاري البحث عن حل المشكلة، هل تريد مسح قاعدة البيانات؟</string>
+    <string name="home_error_logic_title">حدث خطأ ما</string>
+    <string name="notification_body_prayers_ready">كنت حاولت ان تصل للمواقيت بدون انترنت</string>
+    <string name="notification_title_prayers_ready">مواقيت الصلاة متاحة الآن في ميقات</string>
+    <string name="action_time_settings">الإعدادات</string>
+    <string name="location_error_connection">لم نتمكن من حفظ موقعك، رجاءََا أعد المحاولة</string>
 </resources>

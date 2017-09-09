@@ -14,7 +14,6 @@ import android.widget.TextView;
 
 import com.afterapps.chronos.Constants;
 import com.afterapps.chronos.R;
-import com.afterapps.chronos.Utilities;
 import com.afterapps.chronos.beans.Prayer;
 import com.mikepenz.iconics.IconicsDrawable;
 
@@ -25,6 +24,8 @@ import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
+import static com.afterapps.chronos.Utilities.getPrayerIcon;
 
 /*
  * Created by mahmoud on 8/27/17.
@@ -103,7 +104,7 @@ class PrayersAdapter extends RecyclerView.Adapter<PrayersAdapter.PrayerViewHolde
             final String prayerTitle = prayerNames.get(prayer.getWhichPrayer())[mArabic ? 2 : 0];
             final String prayerSubtitle = prayerNames.get(prayer.getWhichPrayer())[mArabic ? 3 : 1];
             final String daySubHeaderString = getDayString(prayer);
-            final IconicsDrawable prayerIcon = Utilities.getPrayerIcon(prayer, mContext);
+            final IconicsDrawable prayerIcon = getPrayerIcon(prayer, mContext, getIconColorResId());
             final int textColor = getTextColor();
             final int textStyle = getTextStyle();
             mItemPrayerTitleTextView.setText(prayerTitle);
@@ -119,6 +120,10 @@ class PrayersAdapter extends RecyclerView.Adapter<PrayersAdapter.PrayerViewHolde
             if (mItemPrayerDayTextView != null) {
                 mItemPrayerDayTextView.setText(daySubHeaderString);
             }
+        }
+
+        private int getIconColorResId() {
+            return getAdapterPosition() == 0 ? R.color.colorAccent : R.color.colorTextSecondary;
         }
 
         private String getDayString(Prayer prayer) {

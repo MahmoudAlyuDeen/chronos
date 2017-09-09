@@ -8,6 +8,7 @@
     <string name="about_api_url" translatable="false">http://aladhan.com/about</string>
     <string name="mosque_design_url" translatable="false">http://www.freepik.com/free-vector/mosque-silhouette-in-night-sky-with-crescent-moon-and-stars_870865.htm</string>
     <string name="qibla_with_google_url">https://qiblafinder.withgoogle.com/intl/en/</string>
+    <string name="empty_string" translatable="false"/>
 
     <!--home screen-->
     <string name="up_next_title">You have</string>
@@ -32,10 +33,16 @@
     <string name="noun_subtitle">noun</string>
 
     <!--errors and warnings-->
-    <string name="error_connection_title">Can\'t load prayers</string>
-    <string name="error_connection_prompt">No internet connection. We can notify you when prayers are available.</string>
-    <string name="error_reverse_geolocation">Can\'t add location; system time is not set correctly</string>
+    <string name="home_error_connection_title">Can\'t load prayers</string>
+    <string name="home_error_connection_prompt">No internet connection. We can notify you when prayers are available.</string>
+    <string name="location_error_reverse_geolocation">Can\'t add location; system time is not set correctly</string>
     <string name="error_play_services">Google Play Services must be installed</string>
+    <string name="home_error_logic_title">Something went wrong</string>
+    <string name="home_error_logic_prompt">We\'re looking into the problem, please bear with us. Meanwhile, would you like to clear the database and start over?</string>
+    <string name="action_clear">Clear</string>
+    <string name="action_restart">Restart</string>
+    <string name="home_error_connection_notify_confirmation">You will be notified when prayers are available</string>
+    <string name="location_error_connection">Couldn\'t save your location, please retry</string>
 
     <!--preferences-->
     <string name="preference_key_design" translatable="false">preferenceKeyDesign</string>
@@ -72,16 +79,10 @@
         \n\n(You may be prompted to grant location permission)</string>
     <string name="dialog_positive_location_method">Determine automatically</string>
     <string name="dialog_negative_location_method">Manual search</string>
-    <string name="empty_string" translatable="false"/>
     <string name="action_play_services">Install</string>
     <string name="error_location_detection">Couldn\'t detect your location</string>
     <string name="action_location_manual">Search</string>
-    <string name="up_next_mosque_anchor">000000</string>
-    <string name="error_logic_title">Something went wrong</string>
-    <string name="error_logic_prompt">We\'re looking into the problem, please bear with us. Meanwhile, would you like to clear the database and start over?</string>
-    <string name="action_clear">Clear</string>
-    <string name="action_restart">Restart</string>
-    <string name="error_connection_notify_confirmation">You will be notified when prayers are available</string>
+    <string name="up_next_mosque_anchor" translatable="false">000000</string>
 
     <!--home screen widget-->
     <string name="empty_state_widget">Prayers not loaded yet. Tap to open the app</string>
@@ -89,5 +90,6 @@
     <!--notifications-->
     <string name="notification_body_prayers_ready">You tried to view timings when you were offline.</string>
     <string name="notification_title_prayers_ready">View prayer timings in Miqat</string>
+    <string name="action_time_settings">Settings</string>
 
 </resources>

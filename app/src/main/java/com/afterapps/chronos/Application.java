@@ -36,7 +36,6 @@ public class Application extends android.app.Application {
 
         PreferenceManager.setDefaultValues(this, R.xml.settings, false);
 
-        //todo: enable un-comment out this before release
 //        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
 //            @Override
 //            public void uncaughtException(Thread thread, Throwable throwable) {

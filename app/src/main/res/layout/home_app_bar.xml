@@ -49,7 +49,7 @@
                     android:layout_gravity="end"
                     android:adjustViewBounds="true"
                     android:maxHeight="@dimen/home_mosque_max_height"
-                    android:src="@drawable/app_bar_mosque_flipping"
+                    android:src="@drawable/app_bar_mosque_rtl_ready"
                     tools:ignore="ContentDescription"/>
 
             </FrameLayout>

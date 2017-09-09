@@ -202,17 +202,18 @@ public class LocationActivity
 
     @Override
     public void onReverseGeolocationError() {
-        showReverseGeolocationError();
-    }
-
-    private void showReverseGeolocationError() {
-        Snackbar.make(mLocationsRecycler, R.string.error_reverse_geolocation, Snackbar.LENGTH_INDEFINITE)
-                .setAction(R.string.action_location_manual, new View.OnClickListener() {
+        Snackbar.make(mLocationsRecycler, R.string.location_error_reverse_geolocation, Snackbar.LENGTH_INDEFINITE)
+                .setAction(R.string.action_time_settings, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        startAutoCompleteOverlay();
+                        startActivity(new Intent(android.provider.Settings.ACTION_DATE_SETTINGS));
                     }
                 }).show();
+    }
+
+    @Override
+    public void showConnectionError() {
+        Snackbar.make(mLocationsRecycler, R.string.location_error_connection, Snackbar.LENGTH_INDEFINITE).show();
     }
 
     @Override

@@ -145,7 +145,6 @@ public class HomeActivity
         stopTicking();
         mUpcomingPrayer = null;
         mUpcomingPrayers = null;
-        mPrayerList = null;
         mUpcomingLogo = null;
         if (mPref != null) {
             mPref.unregisterOnSharedPreferenceChangeListener(this);
@@ -170,6 +169,7 @@ public class HomeActivity
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        stopTicking();
         if (mPref == null) return;
         final String method = mPref.getString(getString(R.string.preference_key_method),
                 getString(R.string.preference_default_method));
@@ -179,8 +179,8 @@ public class HomeActivity
                 getString(R.string.preference_default_latitude));
         mUpcomingPrayer = null;
         mUpcomingPrayers = null;
-        mPrayerList = null;
         mUpcomingLogo = null;
+        mPrayerList = null;
         presenter.getPrayers(method, school, latitudeMethod);
     }
 
@@ -231,14 +231,19 @@ public class HomeActivity
     }
 
     private void startTicking() {
+        stopTicking();
         mTickerHandler = new Handler();
         mTickerRunnable = new Runnable() {
             @Override
             public void run() {
                 try {
-                    filterPrayers();
+                    if (mTickerHandler != null && mTickerRunnable != null) {
+                        filterPrayers();
+                    }
                 } finally {
-                    mTickerHandler.postDelayed(mTickerRunnable, 1000);
+                    if (mTickerHandler != null && mTickerRunnable != null) {
+                        mTickerHandler.postDelayed(mTickerRunnable, 1000);
+                    }
                 }
             }
         };
@@ -248,10 +253,13 @@ public class HomeActivity
     private void stopTicking() {
         if (mTickerHandler != null && mTickerRunnable != null) {
             mTickerHandler.removeCallbacks(mTickerRunnable);
+            mTickerHandler = null;
+            mTickerRunnable = null;
         }
     }
 
     private void filterPrayers() {
+        if (mTickerHandler == null || mTickerRunnable == null) return;
         final Calendar calendar = Calendar.getInstance();
         final long currentTimestamp = calendar.getTimeInMillis();
         final List<Prayer> allUpcomingPrayers = getUpcomingPrayers(mPrayerList, currentTimestamp);

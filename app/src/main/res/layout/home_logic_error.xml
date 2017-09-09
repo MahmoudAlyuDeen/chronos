@@ -34,7 +34,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/error_logic_title"
+            android:text="@string/home_error_logic_title"
             android:textColor="@color/colorTextPrimary"
             android:textSize="@dimen/text_size_big"
             android:textStyle="bold"/>
@@ -43,7 +43,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="@string/error_logic_prompt"
+            android:text="@string/home_error_logic_prompt"
             android:textColor="@color/colorTextSecondary"
             android:textSize="@dimen/text_size_primary"/>
 

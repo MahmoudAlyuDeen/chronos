@@ -1,8 +1,8 @@
 package com.afterapps.chronos;
 
 import android.os.Bundle;
-import android.widget.Toast;
 
+import com.google.firebase.crash.FirebaseCrash;
 import com.hannesdorfmann.mosby3.mvp.MvpActivity;
 import com.hannesdorfmann.mosby3.mvp.MvpPresenter;
 import com.hannesdorfmann.mosby3.mvp.MvpView;
@@ -17,7 +17,7 @@ import static com.afterapps.chronos.Constants.VIEW_STATE_ERROR;
 import static com.afterapps.chronos.Constants.VIEW_STATE_IDLE;
 import static com.afterapps.chronos.Constants.VIEW_STATE_PROGRESS;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "EmptyMethod"})
 public abstract class BaseActivity<V extends MvpView, P extends MvpPresenter<V>>
         extends MvpActivity<V, P>
         implements MvpView {
@@ -42,6 +42,7 @@ public abstract class BaseActivity<V extends MvpView, P extends MvpPresenter<V>>
     }
 
     public void showError() {
+        reportCrash();
         viewState = VIEW_STATE_ERROR;
         displayViewState();
     }
@@ -59,6 +60,10 @@ public abstract class BaseActivity<V extends MvpView, P extends MvpPresenter<V>>
     public void showAction() {
         viewState = VIEW_STATE_ACTION;
         displayViewState();
+    }
+
+    protected void reportCrash() {
+        FirebaseCrash.log("Logic error occurred");
     }
 
     @Override
@@ -106,9 +111,5 @@ public abstract class BaseActivity<V extends MvpView, P extends MvpPresenter<V>>
     }
 
     protected void discardData() {
-    }
-
-    public void showConnectionError() {
-        Toast.makeText(this, R.string.error_connection_title, Toast.LENGTH_SHORT).show();
     }
 }

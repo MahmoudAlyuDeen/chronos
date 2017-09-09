@@ -76,10 +76,12 @@ public class Utilities {
     }
 
     @NonNull
-    public static IconicsDrawable getPrayerIcon(Prayer prayer, Context context) {
+    public static IconicsDrawable getPrayerIcon(final Prayer prayer,
+                                                final Context context,
+                                                final int colorResId) {
         final IconicsDrawable prayerIcon =
                 new IconicsDrawable(context)
-                        .color(ContextCompat.getColor(context, R.color.colorTextSecondary));
+                        .color(ContextCompat.getColor(context, colorResId));
         switch (prayer.getWhichPrayer()) {
             case "fajr":
                 prayerIcon.icon(WeatherIcons.Icon.wic_stars);
@@ -110,7 +112,7 @@ public class Utilities {
                                                      final long nextMidnightTimestamp)
             throws IllegalStateException {
         try {
-            return Lists.newArrayList(Iterables.filter(prayerList, new Predicate<Prayer>() {
+            return prayerList == null ? new ArrayList<Prayer>() : Lists.newArrayList(Iterables.filter(prayerList, new Predicate<Prayer>() {
                 @Override
                 public boolean apply(Prayer prayer) {
                     return prayer.getTimestamp() > midnightTimestamp &&
@@ -123,11 +125,11 @@ public class Utilities {
     }
 
     @NonNull
-    public static ArrayList<Prayer> getUpcomingPrayers(List<Prayer> prayerList,
+    public static ArrayList<Prayer> getUpcomingPrayers(final List<Prayer> prayerList,
                                                        final long currentTimestamp)
             throws IllegalStateException {
         try {
-            return Lists.newArrayList(Iterables.filter(prayerList, new Predicate<Prayer>() {
+            return prayerList == null ? new ArrayList<Prayer>() : Lists.newArrayList(Iterables.filter(prayerList, new Predicate<Prayer>() {
                 @Override
                 public boolean apply(Prayer prayer) {
                     return prayer.getTimestamp() > currentTimestamp;
@@ -197,14 +199,14 @@ public class Utilities {
 
 
     @SuppressLint("ApplySharedPref")
-    public static void setWillNotify(Context context, final boolean willNotify) {
+    public static void setWillNotify(final Context context, final boolean willNotify) {
         PreferenceManager.getDefaultSharedPreferences(context)
                 .edit()
                 .putBoolean(WILL_NOTIFY_FLAG, willNotify)
                 .commit();
     }
 
-    public static boolean getWillNotify(Context context) {
+    public static boolean getWillNotify(final Context context) {
         return PreferenceManager.getDefaultSharedPreferences(context)
                 .getBoolean(WILL_NOTIFY_FLAG, false);
     }

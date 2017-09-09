@@ -13,6 +13,8 @@ import com.afterapps.chronos.beans.Location;
 
 import java.util.Date;
 
+import javax.net.ssl.SSLHandshakeException;
+
 import io.realm.Realm;
 import io.realm.RealmResults;
 import retrofit2.Call;
@@ -66,14 +68,18 @@ class LocationModel {
                     selectLocation(response.body().getTimeZoneId());
                     mLocationCallBack.onLocationHandled();
                 } else {
-                    mLocationCallBack.onReverseGeolocationError();
+                    mLocationCallBack.onConnectionError();
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<ReverseGeoLocResponse> call,
                                   @NonNull Throwable t) {
-                mLocationCallBack.onConnectionError();
+                if (t instanceof SSLHandshakeException) {
+                    mLocationCallBack.onReverseGeolocationError();
+                } else {
+                    mLocationCallBack.onConnectionError();
+                }
             }
         });
     }
