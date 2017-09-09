@@ -16,9 +16,9 @@ class HomePresenter extends MvpBasePresenter<HomeView>
 
     private PrayerModel mPrayerModel;
 
-    void getPrayers(String method, String school, String latitudeMethod) {
+    void getPrayers(final String method, final String school, final String latitudeMethod, final String uid) {
         if (mPrayerModel == null) {
-            mPrayerModel = new PrayerModel(this);
+            mPrayerModel = new PrayerModel(this, uid);
         }
         if (isViewAttached() && getView() != null) {
             getView().showProgress();
@@ -27,7 +27,7 @@ class HomePresenter extends MvpBasePresenter<HomeView>
     }
 
     @Override
-    public void onPrayersReady(List<Prayer> prayersDetached) {
+    public void onPrayersReady(final List<Prayer> prayersDetached) {
         JobManager.instance().cancelAllForTag(PrayersJob.TAG);
         if (isViewAttached() && getView() != null) {
             getView().onPrayersReady(prayersDetached);

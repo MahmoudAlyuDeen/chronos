@@ -20,7 +20,6 @@ import com.afterapps.chronos.api.Responses.TimingsResponse;
 import com.afterapps.chronos.beans.Location;
 import com.afterapps.chronos.beans.Prayer;
 import com.afterapps.chronos.home.HomeActivity;
-import com.afterapps.chronos.home.PrayerModel;
 import com.evernote.android.job.Job;
 import com.evernote.android.job.JobRequest;
 
@@ -126,7 +125,7 @@ public class PrayersJob extends Job {
     }
 
     private boolean loadPrayers(String signature) {
-        return PrayerModel.getStoredPrayers(signature).size() >= 6;
+        return false;
     }
 
     private boolean fetchPrayers(final String method,
@@ -176,17 +175,17 @@ public class PrayersJob extends Job {
                 school,
                 latitudeMethod,
                 locationDetached);
-        final Realm realm = Realm.getDefaultInstance();
-        realm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                realm.copyToRealmOrUpdate(currentMonthPrayers);
-                realm.copyToRealmOrUpdate(nextMonthPrayers);
-
-            }
-        });
-        realm.close();
-        return true;
+//        final Realm realm = Realm.getDefaultInstance();
+//        realm.executeTransaction(new Realm.Transaction() {
+//            @Override
+//            public void execute(Realm realm) {
+//                realm.copyToRealmOrUpdate(currentMonthPrayers);
+//                realm.copyToRealmOrUpdate(nextMonthPrayers);
+//
+//            }
+//        });
+//        realm.close();
+        return false;
     }
 
     public class PrayersFetchedEvent {

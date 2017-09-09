@@ -35,4 +35,8 @@
         <item name="colorControlActivated">@color/colorAccent</item>
     </style>
 
+    <style name="SplashScreenTheme" parent="AppTheme">
+        <item name="android:windowBackground">@drawable/splash_screen</item>
+    </style>
+
 </resources>

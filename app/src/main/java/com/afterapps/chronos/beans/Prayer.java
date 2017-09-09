@@ -1,15 +1,14 @@
 package com.afterapps.chronos.beans;
 
-import io.realm.RealmObject;
-import io.realm.annotations.PrimaryKey;
-
 /*
  * Created by mahmoud on 8/12/17.
  */
 @SuppressWarnings({"unused", "FieldCanBeLocal"})
-public class Prayer extends RealmObject {
+public class Prayer
+//        extends RealmObject
+{
 
-    @PrimaryKey
+//    @PrimaryKey
     private String primaryKey;
     private long timestamp;
     private String whichPrayer;
@@ -28,6 +27,10 @@ public class Prayer extends RealmObject {
         this.whichPrayer = whichPrayer;
         this.timestamp = timestamp;
         this.primaryKey = signature + whichPrayer + timestamp;
+    }
+
+    public String getPrimaryKey() {
+        return primaryKey;
     }
 
     public long getTimestamp() {

@@ -15,14 +15,19 @@
         tools:ignore="AllowBackup,GoogleAppIndexingWarning">
 
         <activity android:name="com.afterapps.chronos.home.HomeActivity">
+
+        </activity>
+
+        <activity android:name=".location.LocationActivity"/>
+        <activity android:name=".preferences.SettingsActivity"/>
+        <activity
+            android:name=".splash.SplashActivity"
+            android:theme="@style/SplashScreenTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-
-        <activity android:name=".location.LocationActivity"/>
-        <activity android:name=".preferences.SettingsActivity"/>
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

@@ -33,6 +33,7 @@ import com.afterapps.chronos.beans.Prayer;
 import com.afterapps.chronos.job.PrayersJob;
 import com.afterapps.chronos.location.LocationActivity;
 import com.afterapps.chronos.preferences.SettingsActivity;
+import com.afterapps.chronos.splash.SplashActivity;
 import com.mikepenz.iconics.IconicsDrawable;
 
 import org.greenrobot.eventbus.EventBus;
@@ -57,6 +58,7 @@ import static com.afterapps.chronos.Constants.DISPLAY_THRESHOLD;
 import static com.afterapps.chronos.Constants.FROM_ON_BOARDING;
 import static com.afterapps.chronos.Constants.NOTIFICATION_TAG_PRAYERS_READY;
 import static com.afterapps.chronos.Constants.PRAYER_NAMES;
+import static com.afterapps.chronos.Constants.UID_EXTRA;
 import static com.afterapps.chronos.Utilities.getDayTimeLogo;
 import static com.afterapps.chronos.Utilities.getUpcomingPrayers;
 import static com.afterapps.chronos.Utilities.getWillNotify;
@@ -181,7 +183,12 @@ public class HomeActivity
         mUpcomingPrayers = null;
         mUpcomingLogo = null;
         mPrayerList = null;
-        presenter.getPrayers(method, school, latitudeMethod);
+        final String uid = getIntent().getStringExtra(UID_EXTRA);
+        if (uid == null) {
+            startActivity(new Intent(this, SplashActivity.class));
+        } else {
+            presenter.getPrayers(method, school, latitudeMethod, uid);
+        }
     }
 
     @Override

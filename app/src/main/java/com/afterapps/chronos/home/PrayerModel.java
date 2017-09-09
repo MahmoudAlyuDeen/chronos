@@ -5,26 +5,37 @@ package com.afterapps.chronos.home;
  */
 
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.afterapps.chronos.api.Responses.TimingsResponse;
 import com.afterapps.chronos.api.ServiceGenerator;
 import com.afterapps.chronos.api.TimingsService;
 import com.afterapps.chronos.beans.Location;
 import com.afterapps.chronos.beans.Prayer;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import io.realm.Realm;
-import io.realm.Sort;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 import static com.afterapps.chronos.Constants.FETCH_THRESHOLD;
 import static com.afterapps.chronos.Constants.PREFETCH_THRESHOLD;
+import static com.afterapps.chronos.Utilities.getUpcomingPrayers;
 
 public class PrayerModel {
+
+    private final DatabaseReference prayersRef;
 
     private boolean shouldWaitForConcurrentResponse;
 
@@ -40,8 +51,11 @@ public class PrayerModel {
 
     private final PrayerCallback mPrayerCallback;
 
-    PrayerModel(PrayerCallback prayerCallback) {
+    PrayerModel(final PrayerCallback prayerCallback, final String uid) {
         mPrayerCallback = prayerCallback;
+        this.prayersRef = FirebaseDatabase.getInstance()
+                .getReference()
+                .child(uid);
     }
 
     void getPrayers(final String method, final String school, final String latitudeMethod) {
@@ -58,34 +72,68 @@ public class PrayerModel {
         realm.close();
         final String timeZoneId = locationDetached.getTimezoneId();
         final String signature = timeZoneId + method + school + latitudeMethod;
-        final List<Prayer> prayersDetached = getStoredPrayers(signature);
-        if (prayersDetached.size() < FETCH_THRESHOLD) {
-            shouldWaitForConcurrentResponse = true;
-            fetchPrayers(method, school, latitudeMethod, locationDetached, true);
-            fetchPrayers(method, school, latitudeMethod, locationDetached, false);
-        } else {
-            if (prayersDetached.size() < PREFETCH_THRESHOLD) {
-                shouldWaitForConcurrentResponse = true;
-                fetchPrayers(method, school, latitudeMethod, locationDetached, true);
-            }
-            mPrayerCallback.onPrayersReady(prayersDetached);
-        }
-    }
-
-    public static List<Prayer> getStoredPrayers(String signature) {
         final Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR_OF_DAY, 0);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
         final long midnightTimestamp = calendar.getTimeInMillis();
-        final Realm realm = Realm.getDefaultInstance();
-        final List<Prayer> prayersDetached = realm.copyFromRealm(realm.where(Prayer.class)
-                .equalTo("signature", signature)
-                .greaterThan("timestamp", midnightTimestamp)
-                .findAllSorted("timestamp", Sort.ASCENDING));
-        realm.close();
-        return prayersDetached;
+
+        prayersRef.child(signature.replace("/", ""))
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.hasChildren()) {
+                            List<Prayer> prayersDetached = new ArrayList<>();
+
+                            for (DataSnapshot prayerSnapshot : dataSnapshot.getChildren()) {
+                                Prayer prayer = prayerSnapshot.getValue(Prayer.class);
+                                prayersDetached.add(prayer);
+                            }
+
+                            prayersDetached = getUpcomingPrayers(prayersDetached, midnightTimestamp);
+                            Collections.sort(prayersDetached, new Comparator<Prayer>() {
+                                @Override
+                                public int compare(Prayer o1, Prayer o2) {
+                                    return o1.getTimestamp() > o2.getTimestamp() ? 1 : -1;
+                                }
+                            });
+
+                            if (prayersDetached.size() < FETCH_THRESHOLD) {
+                                shouldWaitForConcurrentResponse = true;
+                                fetchPrayers(method, school, latitudeMethod, locationDetached, true);
+                                fetchPrayers(method, school, latitudeMethod, locationDetached, false);
+                            } else {
+                                if (prayersDetached.size() < PREFETCH_THRESHOLD) {
+                                    shouldWaitForConcurrentResponse = true;
+                                    fetchPrayers(method, school, latitudeMethod, locationDetached, true);
+                                }
+                                mPrayerCallback.onPrayersReady(prayersDetached);
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        Log.d("@@@@", "onCancelled: ");
+                        mPrayerCallback.onConnectionError();
+                    }
+                });
     }
+
+//    public static List<Prayer> getStoredPrayers(String signature) {
+//        final Calendar calendar = Calendar.getInstance();
+//        calendar.set(Calendar.HOUR_OF_DAY, 0);
+//        calendar.set(Calendar.MINUTE, 0);
+//        calendar.set(Calendar.SECOND, 0);
+//        final long midnightTimestamp = calendar.getTimeInMillis();
+//        final Realm realm = Realm.getDefaultInstance();
+//        final List<Prayer> prayersDetached = realm.copyFromRealm(realm.where(Prayer.class)
+//                .equalTo("signature", signature)
+//                .greaterThan("timestamp", midnightTimestamp)
+//                .findAllSorted("timestamp", Sort.ASCENDING));
+//        realm.close();
+//        return prayersDetached;
+//    }
 
     private void fetchPrayers(final String method,
                               final String school,
@@ -115,6 +163,32 @@ public class PrayerModel {
         });
     }
 
+    private void storePrayers(final TimingsResponse timingsResponse,
+                              final String method,
+                              final String school,
+                              final String latitudeMethod,
+                              final Location locationDetached) {
+        try {
+            final List<Prayer> prayers = timingsResponse.getPrayers(method,
+                    school,
+                    latitudeMethod,
+                    locationDetached);
+            for (Prayer prayer : prayers) {
+                prayersRef.child(prayer.getSignature().replace("/", ""))
+                        .child(prayer.getPrimaryKey().replace("/", ""))
+                        .setValue(prayer);
+            }
+
+            if (shouldWaitForConcurrentResponse) {
+                shouldWaitForConcurrentResponse = false;
+            } else {
+                getPrayers(method, school, latitudeMethod);
+            }
+        } catch (IllegalAccessException e) {
+            mPrayerCallback.onLogicError();
+        }
+    }
+
     public static Call<TimingsResponse> getTimingsCall(final String method,
                                                        final String school,
                                                        final String latitudeMethod,
@@ -136,41 +210,41 @@ public class PrayerModel {
         );
     }
 
-    private void storePrayers(final TimingsResponse timingsResponse,
-                              final String method,
-                              final String school,
-                              final String latitudeMethod,
-                              final Location locationDetached) {
-        try {
-            final List<Prayer> prayers = timingsResponse.getPrayers(method,
-                    school,
-                    latitudeMethod,
-                    locationDetached);
-            final Realm realm = Realm.getDefaultInstance();
-            realm.executeTransaction(new Realm.Transaction() {
-                @Override
-                public void execute(Realm realm) {
-                    realm.copyToRealmOrUpdate(prayers);
-                    final String timeZoneId = locationDetached.getTimezoneId();
-                    final String signature = timeZoneId + method + school + latitudeMethod;
-                    final List<Prayer> prayersDetached = getStoredPrayers(signature);
-
-                    if (shouldWaitForConcurrentResponse) {
-                        shouldWaitForConcurrentResponse = false;
-                    } else {
-                        if (prayersDetached.size() == 0) {
-                            mPrayerCallback.onLogicError();
-                            return;
-                        }
-                        mPrayerCallback.onPrayersReady(prayersDetached);
-                    }
-                }
-            });
-            realm.close();
-        } catch (IllegalAccessException e) {
-            mPrayerCallback.onLogicError();
-        }
-    }
+//    private void storePrayers(final TimingsResponse timingsResponse,
+//                              final String method,
+//                              final String school,
+//                              final String latitudeMethod,
+//                              final Location locationDetached) {
+//        try {
+//            final List<Prayer> prayers = timingsResponse.getPrayers(method,
+//                    school,
+//                    latitudeMethod,
+//                    locationDetached);
+//            final Realm realm = Realm.getDefaultInstance();
+//            realm.executeTransaction(new Realm.Transaction() {
+//                @Override
+//                public void execute(Realm realm) {
+//                    realm.copyToRealmOrUpdate(prayers);
+//                    final String timeZoneId = locationDetached.getTimezoneId();
+//                    final String signature = timeZoneId + method + school + latitudeMethod;
+//                    final List<Prayer> prayersDetached = getStoredPrayers(signature);
+//
+//                    if (shouldWaitForConcurrentResponse) {
+//                        shouldWaitForConcurrentResponse = false;
+//                    } else {
+//                        if (prayersDetached.size() == 0) {
+//                            mPrayerCallback.onLogicError();
+//                            return;
+//                        }
+//                        mPrayerCallback.onPrayersReady(prayersDetached);
+//                    }
+//                }
+//            });
+//            realm.close();
+//        } catch (IllegalAccessException e) {
+//            mPrayerCallback.onLogicError();
+//        }
+//    }
 
     @SuppressWarnings("ConstantConditions")
     public static boolean isResponseValid(Response<TimingsResponse> response) {

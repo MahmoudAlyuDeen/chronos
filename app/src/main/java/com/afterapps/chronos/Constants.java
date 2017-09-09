@@ -9,6 +9,8 @@ import java.util.HashMap;
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class Constants {
 
+    public static final String UID_EXTRA = "uIdExtra";
+
     private Constants() {
     }
 

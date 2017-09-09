@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Locale;
 
 import io.realm.Realm;
-import io.realm.Sort;
 
 import static com.afterapps.chronos.Constants.DISPLAY_THRESHOLD;
 import static com.afterapps.chronos.Utilities.getPrayerIcon;
@@ -69,9 +68,7 @@ class PrayersProvider implements RemoteViewsService.RemoteViewsFactory {
             return;
         }
         final String signature = location.getTimezoneId() + method + school + latitudeMethod;
-        List<Prayer> allPrayers = realm.copyFromRealm(realm.where(Prayer.class)
-                .equalTo("signature", signature)
-                .findAllSorted("timestamp", Sort.ASCENDING));
+        final List<Prayer> allPrayers = new ArrayList<>();
         realm.close();
         final Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR_OF_DAY, 0);

@@ -13,6 +13,7 @@ import android.preference.PreferenceManager;
 import com.afterapps.chronos.home.HomeActivity;
 import com.afterapps.chronos.job.TimingsJobCreator;
 import com.evernote.android.job.JobManager;
+import com.google.firebase.database.FirebaseDatabase;
 
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
@@ -35,6 +36,8 @@ public class Application extends android.app.Application {
         JobManager.create(this).addJobCreator(new TimingsJobCreator());
 
         PreferenceManager.setDefaultValues(this, R.xml.settings, false);
+
+        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
 
 //        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
 //            @Override
