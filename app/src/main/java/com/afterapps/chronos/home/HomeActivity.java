@@ -186,6 +186,7 @@ public class HomeActivity
         final String uid = getIntent().getStringExtra(UID_EXTRA);
         if (uid == null) {
             startActivity(new Intent(this, SplashActivity.class));
+            finish();
         } else {
             presenter.getPrayers(method, school, latitudeMethod, uid);
         }

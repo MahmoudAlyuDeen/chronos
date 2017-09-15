@@ -109,6 +109,10 @@ public class PrayerModel {
                                 }
                                 mPrayerCallback.onPrayersReady(prayersDetached);
                             }
+                        } else {
+                            shouldWaitForConcurrentResponse = true;
+                            fetchPrayers(method, school, latitudeMethod, locationDetached, false);
+                            fetchPrayers(method, school, latitudeMethod, locationDetached, true);
                         }
                     }
 
