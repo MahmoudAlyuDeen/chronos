@@ -57,4 +57,5 @@
     <string name="notification_title_prayers_ready">مواقيت الصلاة متاحة الآن في ميقات</string>
     <string name="action_time_settings">الإعدادات</string>
     <string name="location_error_connection">لم نتمكن من حفظ موقعك، رجاءََا أعد المحاولة</string>
+    <string name="generic_error_connection">حدث خطأ ما</string>
 </resources>
